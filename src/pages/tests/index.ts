@@ -1,5 +1,5 @@
 //TODO: @ChartJS++
-import ChartJS from "../../Chart.js";
+import ChartJS from "../../Chart";
 
 const chart = new ChartJS();
 
