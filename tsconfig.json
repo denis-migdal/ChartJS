@@ -5,6 +5,7 @@
         "outDir": "./build/TS",
         "paths": {},
         "sourceMap": true,
+        "declaration": true,
         "alwaysStrict": true,
         "strict": true,
         "noErrorTruncation": true,
