@@ -1,2 +1,11 @@
-# ChartJS++
-A wrapper of Chart.JS enabling you to configure your graphs with OO interfaces.
+<div align="center">
+  <h1>[PROJECT TITLE]</h1>
+
+  <p>[Project description</p>
+</div>
+
+## Build
+
+- `npm run build`
+- `npm run build-prod`
+- `npm run watch`
