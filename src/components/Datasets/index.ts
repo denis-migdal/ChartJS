@@ -24,7 +24,7 @@ export default class Dataset extends WithExtraProps(Component, {
     }
 
     // TODO: cache...
-    protected getParsedData( data: [number, number][]) {
+    protected getParsedData( data: [number, number][] = this.properties.getValue("data") ) {
         let parsedData = new Array(data.length);
         for(let i = 0; i < parsedData.length; ++i) {
             parsedData[i] = {x: data[i][0], y: data[i][1]};
@@ -40,7 +40,7 @@ export default class Dataset extends WithExtraProps(Component, {
     protected override onUpdate() {
         //TODO: check if pending...
         super.onUpdate();
-        this.dataset.data = this.getParsedData( this.properties.getValue("data") );
+        this.dataset.data = this.getParsedData();
         this.dataset.borderColor = this.properties.getValue("color");
     }
 }

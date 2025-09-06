@@ -18,26 +18,12 @@ export default class Component {
 
     readonly properties = new (this.constructor as typeof Component).Properties(this);
 
-    // ts bug...
-    constructor(parent: Chart, opts ?: Record<string, any>);
-    constructor(opts ?: Record<string, any>);
-    constructor(parent_or_opts?: Chart|Record<string, any>,
-                          opts?: Record<string, any>) {
-        let parent: Chart|null = null;
-        if( parent_or_opts instanceof Chart)
-            parent = parent_or_opts;
-        else
-            opts = parent_or_opts;
-
-        if( opts !== undefined)
-            for(let k in opts) {
-                const key = k as keyof typeof Component.Defaults;
-                // @ts-ignore
-                this.properties[key] = opts[key];
-            }
-        
-        if( parent !== null)
-            parent.append(this);
+    constructor(opts: Record<string, any> = {}) {
+        for(let k in opts) {
+            const key = k as keyof typeof Component.Defaults;
+            // @ts-ignore
+            this.properties[key] = opts[key];
+        }
     }
 
     #chart: InternalChart|null = null;
@@ -67,8 +53,6 @@ export function WithExtraProps<
                     >(Base: B, extra: P)
                 : Omit<B, "new" | "prototype">
                 & {Defaults: P}
-                & {new(parent: Chart, opts ?: Partial<P & B["Defaults"]>)
-                    : Merge<B, P>}
                 & {new(opts ?: Partial<P & B["Defaults"]>)
                     : Merge<B, P>} {
 

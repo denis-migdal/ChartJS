@@ -21,7 +21,7 @@ export type InternalChart = {
     readonly requestUpdate: () => void;
 };
 
-export default class Chart extends WithUpdate(Object, {selfAsTarget: false}) {
+export class Chart extends WithUpdate(Object, {selfAsTarget: false}) {
 
     readonly canvas  : Canvas;
     protected _chart!: CJ.Chart;
@@ -76,3 +76,5 @@ export default class Chart extends WithUpdate(Object, {selfAsTarget: false}) {
     //TODO: remove component.
     //TODO: addX()
 }
+
+export default Chart;

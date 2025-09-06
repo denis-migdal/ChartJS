@@ -1,12 +1,13 @@
-import ChartJS   from "../../Chart";
+import ChartJS   from "../../";
 import Line from "../../components/Datasets/Line";
 
 const chart = new ChartJS(); // or new ChartJS(canvas);
 
-const compo = new Line(chart, {color: "red"});
-chart.append( new Line({color: "red", data: [[0,0], [1,1]] as const}) );
+//TODO...
+chart.addLine({color: "red", data: [[0,0], [1,1]] as const});
+const line = chart.createLine({color: "red", data: [[1,0], [0,1]] as const});
 
-compo.properties.color = "red";
+line.properties.color = "blue";
 
 let i = 0;
 /*
