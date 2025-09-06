@@ -1,9 +1,12 @@
 import WithUpdate from "../libs/misc/src/WithUpdate";
 
 import * as CJ from 'chart.js';
+import type Component from "./components";
+import { InternalComponent } from "./components";
 
 // Can't register plugins after graph creation...
 CJ.Chart.register([
+  CJ.ScatterController,
   CJ.CategoryScale,
   CJ.LineController,
   CJ.LineElement,
@@ -13,10 +16,15 @@ CJ.Chart.register([
 
 type Canvas = any;
 
+export type InternalChart = {
+    readonly _chart: CJ.Chart;
+    readonly requestUpdate: () => void;
+};
+
 export default class Chart extends WithUpdate(Object, {selfAsTarget: false}) {
 
     readonly canvas  : Canvas;
-             #_chart!: CJ.Chart;
+    protected _chart!: CJ.Chart;
 
     constructor(canvas: Canvas = document.createElement('canvas')) {
         super();
@@ -29,14 +37,24 @@ export default class Chart extends WithUpdate(Object, {selfAsTarget: false}) {
 
     protected override onUpdate() {
 
-        // TODO : properties updates + components updates.
+        for(let i = 0; i < this.#components.length; ++i) {
+            const compo = this.#components[i];
+            if( compo.insertIsPending ) {
+                // @ts-ignore
+                compo.onInsert(this);
+                compo.insertIsPending = false;
+            }
+        }
 
-        this.#_chart.update('none');
+        for(let i = 0; i < this.#components.length; ++i)
+            this.#components[i].onUpdate();
+
+        this._chart.update('none');
     }
 
     protected override onInit() {
 
-        this.#_chart = new CJ.Chart(this.canvas, {
+        this._chart = new CJ.Chart(this.canvas, {
             options: {
 				locale: 'en-IN',
 				animation: false,
@@ -44,14 +62,17 @@ export default class Chart extends WithUpdate(Object, {selfAsTarget: false}) {
 				maintainAspectRatio: false,
             },
             data: {
-                labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                datasets: [{
-                    type: "line",
-                    label: '# of Votes',
-                    data: [[0,0], [1,1]],
-                    borderColor: 'red'
-                }]
+                datasets: []
             }
         });
     }
+
+    #components = new Array<InternalComponent>();
+    append(component: Component) {
+        const compo     = component as unknown as InternalComponent;
+        compo.insertIsPending = true;
+        this.#components.push(compo);
+    }
+    //TODO: remove component.
+    //TODO: addX()
 }
