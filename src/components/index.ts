@@ -14,7 +14,7 @@ export default class Component {
     static Defaults = {};
     static readonly Properties = buildProperties(Component.Defaults);
 
-    readonly defaults!: Record<string, never>; // for typing purposes.
+    readonly defaults!: {}; // for typing purposes.
     readonly properties = new (this.constructor as typeof Component).Properties(this) as Properties<this["defaults"]>;
 
     constructor(opts: Record<string, any> = {}) {
@@ -45,27 +45,36 @@ export default class Component {
 // - One to properly set defaults.
 // - One to properly set constructor.
 
+type MergeProps<BP extends Record<string, any>,
+                P  extends Record<string, any>
+            > = {
+    [K in keyof BP | keyof P]: K extends keyof P ? P[K]
+                                                 : K extends keyof BP ? BP[K]
+                                                                      : never;
+}
+
 // for type purpose
 function ExtendsMixins<
-                    B extends Cstr<any> & {Defaults: Record<string,any>},
-                    P extends Record<string, any>
+                    B  extends Cstr<any>,
+                    BP extends Record<string, any>,
+                    P  extends Record<string, any>
                 >(Base: B, extra: P) {
 
-    const Defaults = {...Base.Defaults, ...extra};
+    //const Defaults = {...Base.Defaults, ...extra};
 
     return class extends Base {
 
-        static override Defaults   = Defaults;
-        static readonly Properties = buildProperties(Defaults);
+        static Defaults            = null as any as MergeProps<BP, P>;
+        static readonly Properties = null as any as ReturnType<typeof buildProperties<MergeProps<BP, P>>>;
 
         // for type purposes
-        defaults!: P & B["Defaults"]
+        defaults!: MergeProps<BP, P>;
     }
 }
 
 type MixP<B extends Cstr<any> & {Defaults: Record<string,any>},
           P extends Record<string, any>
-        > = ReturnType<typeof ExtendsMixins<B,P>>
+        > = ReturnType<typeof ExtendsMixins<Omit<B, "Defaults"> & {new(): InstanceType<B>}, B["Defaults"], P>>
 
 // for now, works
 // Can't Omit<InstanceType<B>> without removing protected members...
@@ -73,8 +82,8 @@ export function WithExtraProps<
                         B extends Cstr<any> & {Defaults: Record<string,any>},
                         P extends Record<string, any>
                     >(Base: B, extra: P)
-                : Omit<MixP<B,P>, "prototype"> 
-                & {new(args?: Partial<B["Defaults"] & P>): InstanceType<MixP<B,P>>} {
+                : Omit<MixP<B,P>, "prototype">
+                & {new(args?: Partial<MergeProps<B, P>>): InstanceType<MixP<B,P>>} {
 
     const Defaults = {...Base.Defaults, ...extra};
 

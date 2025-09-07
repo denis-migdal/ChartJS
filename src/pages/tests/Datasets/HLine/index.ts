@@ -10,7 +10,6 @@ line1.properties.color = "red";
 
 const line2 = chart.createHLine({color: "green"});
 line2.properties.data = 0.4;
-line2.properties.dddd = 2;
-line2.properties.showPoints = true;
+line2.properties.showPoints = false;
 
 document.body.append(chart.canvas);

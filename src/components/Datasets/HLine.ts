@@ -21,14 +21,18 @@ function buildOpts(data_or_opts?: LineData|LineOpts,
 
 // https://github.com/microsoft/TypeScript/issues/62395
 export default class HLine extends WithExtraProps(Line, {
-            data: null as null|number,
-            showPoints: true as const,
+            data: null as LineData,
+            showPoints: false as const,
         }) {
 
     // one line due to ConstructorParem use...
     constructor(...args: [LineData]|[LineOpts]|[LineData, LineOpts]) {
         super( buildOpts(...args) ); // TODO: somehow give condition...
     }
+
+    // fix instance properties type.
+    // @ts-ignore
+    override defaults!: typeof HLine.Defaults;
 
     protected override getParsedData() {
         const value = this.properties.getValue("data");
@@ -43,6 +47,9 @@ export default class HLine extends WithExtraProps(Line, {
         super.onUpdate();
     }
 }
+
+Line.Defaults
+HLine.Defaults // defaults is incorrect...
 
 // =================== PLUGIN =========================
 
