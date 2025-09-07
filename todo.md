@@ -1,6 +1,7 @@
 ## Bugs
 
 - WithUpdate : [key: string]: any (WTF ?)
+- Properties : [key: string]: any (WTF ?) [quick fix for now...]
 - Line constructor : move out somehow ?
 
 ## Features

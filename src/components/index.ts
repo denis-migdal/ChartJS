@@ -14,7 +14,7 @@ export default class Component {
     static Defaults = {};
     static readonly Properties = buildProperties(Component.Defaults);
 
-    readonly defaults!: {}; // for typing purposes.
+    readonly defaults!: Record<string, never>; // for typing purposes.
     readonly properties = new (this.constructor as typeof Component).Properties(this) as Properties<this["defaults"]>;
 
     constructor(opts: Record<string, any> = {}) {

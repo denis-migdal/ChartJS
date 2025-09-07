@@ -11,7 +11,7 @@ function buildOpts(data_or_opts?: LineData|LineOpts,
     if( data_or_opts === null || typeof data_or_opts === "number" ) { // condition might change...
         if( opts === undefined)
             opts = {};
-        opts.value = data_or_opts;
+        opts.data = data_or_opts;
     } else {
         opts = data_or_opts;
     }
@@ -21,7 +21,8 @@ function buildOpts(data_or_opts?: LineData|LineOpts,
 
 // https://github.com/microsoft/TypeScript/issues/62395
 export default class HLine extends WithExtraProps(Line, {
-            value: null as null|number,
+            data: null as null|number,
+            showPoints: true as const,
         }) {
 
     // one line due to ConstructorParem use...
@@ -30,7 +31,7 @@ export default class HLine extends WithExtraProps(Line, {
     }
 
     protected override getParsedData() {
-        const value = this.properties.getValue("value");
+        const value = this.properties.getValue("data");
         if( value === null)
             return [];
 
