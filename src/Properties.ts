@@ -3,10 +3,10 @@ import type Component from "./components";
 type PropertiesDescriptor = Record<string, any>;
 
 type Props< K extends {new(...args: any[]): any},
-            P extends PropertiesDescriptor> = 
-            
-            Omit<K, "constructor">
+            P extends PropertiesDescriptor> = Omit<K, "constructor">
         & {new(...args: ConstructorParameters<K>): InstanceType<K> & P};
+
+export type Properties<T extends PropertiesDescriptor> = InstanceType<ReturnType<typeof buildProperties<T>>>;
 
 export function buildProperties<T extends PropertiesDescriptor>(defaults: T) {
 
@@ -22,11 +22,12 @@ export function buildProperties<T extends PropertiesDescriptor>(defaults: T) {
 
         #values: Partial<T> = {};
 
-        // can't be public as type won't be right...
-        protected setValue<K extends keyof T>(propname: K, propval: T[K]) {
+        setValue<K extends keyof T>(propname: K, propval: T[K]) {
             //TODO: check val...
             this.#values[propname] = propval;
             this.#parent.requestUpdate();
+
+            return this;
         }
 
         getValue<K extends keyof T>(propname: K): T[K] {

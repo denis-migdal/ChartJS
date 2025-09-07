@@ -1,6 +1,5 @@
-import { buildProperties } from "../Properties";
+import { buildProperties, Properties } from "../Properties";
 import type { InternalChart } from "../Chart";
-import Chart from "../Chart";
 import { Cstr } from "../../libs/misc/src/types/Cstr";
 
 export type InternalComponent = {
@@ -13,10 +12,10 @@ export type InternalComponent = {
 export default class Component {
 
     static Defaults = {};
-
     static readonly Properties = buildProperties(Component.Defaults);
 
-    readonly properties = new (this.constructor as typeof Component).Properties(this);
+    readonly defaults!: {}; // for typing purposes.
+    readonly properties = new (this.constructor as typeof Component).Properties(this) as Properties<this["defaults"]>;
 
     constructor(opts: Record<string, any> = {}) {
         for(let k in opts) {
@@ -41,26 +40,46 @@ export default class Component {
     protected onUpdate() {}
 }
 
-type Merge<B extends Cstr<any>, P extends Record<string, any>>
-    = InstanceType<B> & {properties: InstanceType<ReturnType<typeof buildProperties<P>>>};
+// As always TS is stupid...
+// We need 2 steps :
+// - One to properly set defaults.
+// - One to properly set constructor.
+
+// for type purpose
+function ExtendsMixins<
+                    B extends Cstr<any> & {Defaults: Record<string,any>},
+                    P extends Record<string, any>
+                >(Base: B, extra: P) {
+
+    const Defaults = {...Base.Defaults, ...extra};
+
+    return class extends Base {
+
+        static override Defaults   = Defaults;
+        static readonly Properties = buildProperties(Defaults);
+
+        // for type purposes
+        defaults!: P & B["Defaults"]
+    }
+}
+
+type MixP<B extends Cstr<any> & {Defaults: Record<string,any>},
+          P extends Record<string, any>
+        > = ReturnType<typeof ExtendsMixins<B,P>>
 
 // for now, works
-// As always TS is stupid...
 // Can't Omit<InstanceType<B>> without removing protected members...
 export function WithExtraProps<
                         B extends Cstr<any> & {Defaults: Record<string,any>},
                         P extends Record<string, any>
                     >(Base: B, extra: P)
-                : Omit<B, "new" | "prototype">
-                & {Defaults: P}
-                & {new(opts ?: Partial<P & B["Defaults"]>)
-                    : Merge<B, P>} {
+                : Omit<MixP<B,P>, "prototype"> 
+                & {new(args?: Partial<B["Defaults"] & P>): InstanceType<MixP<B,P>>} {
 
     const Defaults = {...Base.Defaults, ...extra};
 
-    // @ts-ignore : TS bug...
     return class extends Base {
-        static override Defaults = Defaults;
-        private static Properties = buildProperties(Defaults);
+        static override Defaults  = Defaults;
+        static Properties = buildProperties(Defaults);
     };
 }
