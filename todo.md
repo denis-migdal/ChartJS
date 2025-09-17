@@ -1,13 +1,9 @@
-## Bugs
-
-- Line constructor : move out somehow ?
-
 ## Features
 
-- 1 component to add (scale)
-- 6 curves to add (+ tests)
+- 6 curves to add
+- get tests ?
 
-- register chart controlers...
+- scale : beforeChartUpdate.
 
 ## Interactive
 
@@ -28,6 +24,10 @@
 - other node manipulation fonctions (.remove(), children, etc).
 
 - setProperty + setProperties
+
+- Line constructor : move out somehow ?
+    - how to generalize ???
+    -> name of the prop + how to recognize it ???
 
 ## Performances
 

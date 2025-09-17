@@ -4,8 +4,8 @@ import { Cstr } from "../../libs/misc/src/types/Cstr";
 
 export type InternalComponent = {
     insertIsPending: boolean;
-    onInsert: () => void;
-    onUpdate: () => void;
+    onInsert: (chart: InternalChart) => void;
+    onUpdate: (chart: InternalChart) => void;
     //TODO: onRemove
 }
 
@@ -37,7 +37,7 @@ export default class Component {
     }
 
     //TODO: check if pending...
-    protected onUpdate() {}
+    protected onUpdate(chart: InternalChart) {}
 }
 
 // As always TS is stupid...

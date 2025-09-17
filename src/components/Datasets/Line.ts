@@ -2,20 +2,23 @@ import { ChartDataset } from "chart.js";
 import { WithExtraProps } from "..";
 import Dataset from ".";
 
-//TODO: move out...
+import {Chart, ScatterController, LineElement, PointElement} from 'chart.js';
+// Can't register plugins after graph creation...
+Chart.register([
+  ScatterController,
+  LineElement,
+  PointElement
+]);
+
 type LineData = [number, number][];
 type LineOpts = Partial<(typeof Line)["Defaults"]>;
 
-//TODO... generic fct ?
-function buildOpts(data_or_opts?: LineData|LineOpts,
-                           opts?: LineOpts) {
-    if( Array.isArray(data_or_opts) ) { // condition might change...
-        if( opts === undefined)
-            opts = {};
+function parseLineArgs(data_or_opts: LineData|LineOpts = {},
+                               opts: LineOpts = {}) {
+    if( Array.isArray(data_or_opts) ) // condition might change...
         opts.data = data_or_opts;
-    } else {
+    else
         opts = data_or_opts;
-    }
 
     return opts;
 }
@@ -29,7 +32,7 @@ export default class Line extends WithExtraProps(Dataset, {
 
     // one line due to ConstructorParem use...
     constructor(...args: [LineData]|[LineOpts]|[LineData, LineOpts]) {
-        super( buildOpts(...args) ); // TODO: somehow give condition...
+        super( parseLineArgs(...args) ); // TODO: somehow give condition...
     }
 
     static createDataset() {
@@ -47,8 +50,8 @@ export default class Line extends WithExtraProps(Dataset, {
         return super.dataset as any;
     }
 
-    override onUpdate() {
-        super.onUpdate();
+    override onUpdate(chart: InternalChart) {
+        super.onUpdate(chart);
 
         if( ! this.properties.getValue("showPoints") )
 			this.dataset.pointRadius = 0;
@@ -57,22 +60,22 @@ export default class Line extends WithExtraProps(Dataset, {
 
 // =================== PLUGIN =========================
 
-import Chart from "../../Chart";
+import ChartJS, { InternalChart } from "../../Chart";
 
 type LineArgs = ConstructorParameters<typeof Line>;
 
 declare module "../../Chart" {
-    interface Chart {
-        addLine   (...args: LineArgs): Chart;
+    interface ChartJS {
+        addLine   (...args: LineArgs): ChartJS;
         createLine(...args: LineArgs): Line;
     }
 }
 
-Chart.prototype.addLine = function(...args: LineArgs) {
+ChartJS.prototype.addLine = function(...args: LineArgs) {
     this.createLine(...args);
     return this;
 }
-Chart.prototype.createLine = function(...args: LineArgs) {
+ChartJS.prototype.createLine = function(...args: LineArgs) {
     const line = new Line(...args);
     this.append(line);
     return line;

@@ -37,9 +37,9 @@ export default class Dataset extends WithExtraProps(Component, {
         chart._chart.data.datasets.push(this.dataset);
     }
 
-    protected override onUpdate() {
+    protected override onUpdate(chart: InternalChart) {
         //TODO: check if pending...
-        super.onUpdate();
+        super.onUpdate(chart);
         this.dataset.data = this.getParsedData();
         this.dataset.borderColor = this.properties.getValue("color");
     }

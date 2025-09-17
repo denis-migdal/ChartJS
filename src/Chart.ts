@@ -1,30 +1,21 @@
 import WithUpdate from "../libs/misc/src/WithUpdate";
 
-import * as CJ from 'chart.js';
 import type Component from "./components";
 import { InternalComponent } from "./components";
 
-// Can't register plugins after graph creation...
-CJ.Chart.register([
-  CJ.ScatterController,
-  CJ.CategoryScale,
-  CJ.LineController,
-  CJ.LineElement,
-  CJ.LinearScale,
-  CJ.PointElement
-]);
+import {Chart} from 'chart.js';
 
 type Canvas = any;
 
 export type InternalChart = {
-    readonly _chart: CJ.Chart;
+    readonly _chart: Chart;
     readonly requestUpdate: () => void;
 };
 
-export class Chart extends WithUpdate(Object, {selfAsTarget: false}) {
+export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) {
 
     readonly canvas  : Canvas;
-    protected _chart!: CJ.Chart;
+    protected _chart!: Chart;
 
     constructor(canvas: Canvas = document.createElement('canvas')) {
         super();
@@ -40,21 +31,20 @@ export class Chart extends WithUpdate(Object, {selfAsTarget: false}) {
         for(let i = 0; i < this.#components.length; ++i) {
             const compo = this.#components[i];
             if( compo.insertIsPending ) {
-                // @ts-ignore
-                compo.onInsert(this);
+                compo.onInsert(this as any);
                 compo.insertIsPending = false;
             }
         }
 
         for(let i = 0; i < this.#components.length; ++i)
-            this.#components[i].onUpdate();
+            this.#components[i].onUpdate(this as any);
 
         this._chart.update('none');
     }
 
     protected override onInit() {
 
-        this._chart = new CJ.Chart(this.canvas, {
+        this._chart = new Chart(this.canvas, {
             options: {
 				locale: 'en-IN',
 				animation: false,
@@ -77,4 +67,4 @@ export class Chart extends WithUpdate(Object, {selfAsTarget: false}) {
     //TODO: addX()
 }
 
-export default Chart;
+export default ChartJS;

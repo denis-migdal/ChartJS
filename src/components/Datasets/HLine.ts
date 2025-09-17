@@ -2,13 +2,12 @@ import { WithExtraProps } from "..";
 import Line from "./Line";
 
 //TODO: move out...
-type LineData = null|number;
-type LineOpts = Partial<(typeof HLine)["Defaults"]>;
+type HLineData = null|number;
+type HLineOpts = Partial<(typeof HLine)["Defaults"]>;
 
-//TODO... generic fct ?
-function buildOpts(data_or_opts?: LineData|LineOpts,
-                           opts?: LineOpts) {
-    if( data_or_opts === null || typeof data_or_opts === "number" ) { // condition might change...
+function parseHLineArgs(data_or_opts?: HLineData|HLineOpts,
+                                opts?: HLineOpts) {
+    if( data_or_opts === null || typeof data_or_opts === "number" ) {
         if( opts === undefined)
             opts = {};
         opts.data = data_or_opts;
@@ -21,13 +20,13 @@ function buildOpts(data_or_opts?: LineData|LineOpts,
 
 // https://github.com/microsoft/TypeScript/issues/62395
 export default class HLine extends WithExtraProps(Line, {
-            data: null as LineData,
+            data: null as HLineData,
             showPoints: false as const,
         }) {
 
     // one line due to ConstructorParem use...
-    constructor(...args: [LineData]|[LineOpts]|[LineData, LineOpts]) {
-        super( buildOpts(...args) ); // TODO: somehow give condition...
+    constructor(...args: [HLineData]|[HLineOpts]|[HLineData, HLineOpts]) {
+        super( parseHLineArgs(...args) ); // TODO: somehow give condition...
     }
 
     // fix instance properties type.
@@ -42,10 +41,6 @@ export default class HLine extends WithExtraProps(Line, {
         //TODO...
         return super.getParsedData([ [0, value], [1, value] ]);
     }
-
-    override onUpdate() {
-        super.onUpdate();
-    }
 }
 
 Line.Defaults
@@ -53,22 +48,22 @@ HLine.Defaults // defaults is incorrect...
 
 // =================== PLUGIN =========================
 
-import Chart from "../../Chart";
+import ChartJS from "../../Chart";
 
-type LineArgs = ConstructorParameters<typeof HLine>;
+type HLineArgs = ConstructorParameters<typeof HLine>;
 
 declare module "../../Chart" {
-    interface Chart {
-        addHLine   (...args: LineArgs): Chart;
-        createHLine(...args: LineArgs): HLine;
+    interface ChartJS {
+        addHLine   (...args: HLineArgs): ChartJS;
+        createHLine(...args: HLineArgs): HLine;
     }
 }
 
-Chart.prototype.addHLine = function(...args: LineArgs) {
+ChartJS.prototype.addHLine = function(...args: HLineArgs) {
     this.createHLine(...args);
     return this;
 }
-Chart.prototype.createHLine = function(...args: LineArgs) {
+ChartJS.prototype.createHLine = function(...args: HLineArgs) {
     const line = new HLine(...args);
     this.append(line);
     return line;
