@@ -55,7 +55,7 @@ type MergeProps<BP extends Record<string, any>,
 
 // for type purpose
 function ExtendsMixins<
-                    B  extends Cstr<any>,
+                    B  extends Cstr,
                     BP extends Record<string, any>,
                     P  extends Record<string, any>
                 >(Base: B, extra: P) {
