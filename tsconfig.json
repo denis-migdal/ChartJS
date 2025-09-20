@@ -3,7 +3,9 @@
     "exclude": ["src/tests"],
     "compilerOptions": {
         "outDir": "./build/TS",
-        "paths": {},
+        "paths": {
+            "@misc/*"  : ["./libs/misc/src/*"   ],
+        },
         "sourceMap": true,
         "alwaysStrict": true,
         "strict": true,

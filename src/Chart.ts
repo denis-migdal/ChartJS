@@ -1,4 +1,4 @@
-import WithUpdate from "../libs/misc/src/WithUpdate";
+import WithUpdate from "@misc/WithUpdate";
 
 import type Component from "./components";
 import { InternalComponent } from "./components";
