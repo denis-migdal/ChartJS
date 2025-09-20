@@ -1,6 +1,6 @@
 import { buildProperties, Properties } from "../Properties";
 import type { InternalChart } from "../Chart";
-import { Cstr } from "../../libs/misc/src/types/Cstr";
+import { Cstr } from "@misc/types/Cstr";
 
 export type InternalComponent = {
     insertIsPending: boolean;
