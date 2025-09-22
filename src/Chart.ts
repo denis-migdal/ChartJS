@@ -63,8 +63,13 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) {
         compo.insertIsPending = true;
         this.#components.push(compo);
     }
+
+    import<T extends Component>( component: T ): T {
+        const clone = component.clone();
+        this.append(clone);
+        return clone;
+    }
     //TODO: remove component.
-    //TODO: addX()
 }
 
 export default ChartJS;

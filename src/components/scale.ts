@@ -133,6 +133,7 @@ declare module "../Chart" {
     }
 }
 
+// we keep type checks
 ChartJS.prototype.addScale = function(...args: ScaleArgs) {
     this.createScale(...args);
     return this;

@@ -25,6 +25,11 @@ export default class Component {
         }
     }
 
+    clone(): this {
+        // @ts-ignore
+        return new this.constructor(this.properties);
+    }
+
     #chart: InternalChart|null = null;
     requestUpdate() {
         if( this.#chart !== null)
