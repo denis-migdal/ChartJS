@@ -39,12 +39,10 @@ export default class HLine extends WithExtraProps(Line, {
             return [];
 
         //TODO...
-        return super.getParsedData([ [0, value], [1, value] ]);
+        return super.getParsedData([ [Number.NEGATIVE_INFINITY, value],
+                                     [Number.POSITIVE_INFINITY, value] ]);
     }
 }
-
-Line.Defaults
-HLine.Defaults // defaults is incorrect...
 
 // =================== PLUGIN =========================
 
