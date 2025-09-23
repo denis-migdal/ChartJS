@@ -23,11 +23,10 @@ function parseScaleArgs(name_or_opts: string|ScaleOpts = {}, opts: ScaleOpts = {
 
 function buildLinearScale() {
     return {
-        type    : 'linear',
-        // @ts-ignore
-        beginAtZero: true,
-        offset     : false,
-        grid: {
+        type        : 'linear',
+        beginAtZero : true,
+        offset      : false,
+        grid        : {
             offset: false,
         }
     } as any; // Fuck this.;
@@ -70,7 +69,7 @@ export default class Scale extends WithExtraProps(Component, {
         super( parseScaleArgs(...args) );
     }
 
-    protected override onUpdate(chart: InternalChart): void {
+    protected override onUpdate(chart: ChartJS): void {
 
         super.onUpdate(chart);
 
@@ -106,7 +105,7 @@ export default class Scale extends WithExtraProps(Component, {
 
         scale.position = pos;
 
-        chart._chart.options.scales![name] = scale;
+        (chart as InternalChart)._chart.options.scales![name] = scale;
     }
 
 /*
@@ -122,7 +121,6 @@ export default class Scale extends WithExtraProps(Component, {
 
 
 import ChartJS from "../Chart";
-import { parse } from "@swc/core";
 
 type ScaleArgs = ConstructorParameters<typeof Scale>;
 

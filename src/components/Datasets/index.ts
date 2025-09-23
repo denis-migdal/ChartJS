@@ -1,5 +1,6 @@
 import { ChartDataset, ChartTypeRegistry } from "chart.js";
 import Component, { WithExtraProps } from "..";
+import type Chart from "../../Chart";
 import { InternalChart } from "../../Chart";
 
 // https://github.com/microsoft/TypeScript/issues/62395
@@ -13,7 +14,7 @@ export default class Dataset extends WithExtraProps(Component, {
         return {
             type: "scatter",
             data: []
-        } as any as ChartDataset<T>;
+        } as unknown as ChartDataset<T>;
     }
 
     readonly #dataset: ChartDataset = (this.constructor as typeof Dataset)
@@ -32,12 +33,12 @@ export default class Dataset extends WithExtraProps(Component, {
         return parsedData;
     }
 
-    protected override onInsert(chart: InternalChart) {
+    protected override onInsert(chart: Chart) {
         super.onInsert(chart);
-        chart._chart.data.datasets.push(this.dataset);
+        (chart as InternalChart)._chart.data.datasets.push(this.dataset);
     }
 
-    protected override onUpdate(chart: InternalChart) {
+    protected override onUpdate(chart: Chart) {
         //TODO: check if pending...
         super.onUpdate(chart);
         this.dataset.data = this.getParsedData();

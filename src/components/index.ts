@@ -1,25 +1,22 @@
 import { buildProperties, Properties } from "../Properties";
-import type { InternalChart } from "../Chart";
+import type Chart from "../Chart";
 import { Cstr } from "@misc/types/Cstr";
+import Component from "../Component";
+import { InternalChart } from "../Chart";
 
-export type InternalComponent = {
-    insertIsPending: boolean;
-    onInsert: (chart: InternalChart) => void;
-    onUpdate: (chart: InternalChart) => void;
-    //TODO: onRemove
-}
-
-export default class Component {
+// extends required as we have protected members.
+export default class BaseComponent extends Component {
 
     static Defaults = {};
-    static readonly Properties = buildProperties(Component.Defaults);
+    static readonly Properties = buildProperties(BaseComponent.Defaults);
 
     readonly defaults!: {}; // for typing purposes.
-    readonly properties = new (this.constructor as typeof Component).Properties(this) as Properties<this["defaults"]>;
+    readonly properties = new (this.constructor as typeof BaseComponent).Properties(this) as Properties<this["defaults"]>;
 
     constructor(opts: Record<string, any> = {}) {
+        super(); // useless
         for(let k in opts) {
-            const key = k as keyof typeof Component.Defaults;
+            const key = k as keyof typeof BaseComponent.Defaults;
             // @ts-ignore
             this.properties[key] = opts[key];
         }
@@ -30,19 +27,18 @@ export default class Component {
         return new this.constructor(this.properties);
     }
 
-    #chart: InternalChart|null = null;
+    #chart: Chart|null = null;
     requestUpdate() {
         if( this.#chart !== null)
-            this.#chart.requestUpdate();
+            (this.#chart as InternalChart).requestUpdate();
     }
 
-    private insertIsPending: boolean = false;
-    protected onInsert(chart: InternalChart) {
+    protected onInsert(chart: Chart) {
         this.#chart = chart;
     }
 
     //TODO: check if pending...
-    protected onUpdate(chart: InternalChart) {}
+    protected onUpdate(chart: Chart) {}
 }
 
 // As always TS is stupid...
@@ -69,8 +65,8 @@ function ExtendsMixins<
 
     return class extends Base {
 
-        static Defaults            = null as any as MergeProps<BP, P>;
-        static readonly Properties = null as any as ReturnType<typeof buildProperties<MergeProps<BP, P>>>;
+        static Defaults            = {} as MergeProps<BP, P>;
+        static readonly Properties = {} as ReturnType<typeof buildProperties<MergeProps<BP, P>>>;
 
         // for type purposes
         defaults!: MergeProps<BP, P>;

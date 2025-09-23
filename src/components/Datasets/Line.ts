@@ -50,7 +50,7 @@ export default class Line extends WithExtraProps(Dataset, {
         return super.dataset as any;
     }
 
-    override onUpdate(chart: InternalChart) {
+    override onUpdate(chart: ChartJS) {
         super.onUpdate(chart);
 
         if( ! this.properties.getValue("showPoints") )
@@ -60,7 +60,7 @@ export default class Line extends WithExtraProps(Dataset, {
 
 // =================== PLUGIN =========================
 
-import ChartJS, { InternalChart } from "../../Chart";
+import ChartJS from "../../Chart";
 
 type LineArgs = ConstructorParameters<typeof Line>;
 

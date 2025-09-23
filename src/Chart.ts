@@ -1,16 +1,10 @@
 import WithUpdate from "@misc/WithUpdate";
 
-import type Component from "./components";
-import { InternalComponent } from "./components";
+import { IS_INSERT_PENDING, type default as Component, type InternalComponent } from "./Component";
 
 import {Chart} from 'chart.js';
 
 type Canvas = any;
-
-export type InternalChart = {
-    readonly _chart: Chart;
-    readonly requestUpdate: () => void;
-};
 
 export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) {
 
@@ -30,14 +24,14 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) {
 
         for(let i = 0; i < this.#components.length; ++i) {
             const compo = this.#components[i];
-            if( compo.insertIsPending ) {
-                compo.onInsert(this as any);
-                compo.insertIsPending = false;
+            if( compo[IS_INSERT_PENDING] === true ) {
+                compo.onInsert(this);
+                compo[IS_INSERT_PENDING] = false;
             }
         }
 
         for(let i = 0; i < this.#components.length; ++i)
-            this.#components[i].onUpdate(this as any);
+            this.#components[i].onUpdate(this);
 
         this._chart.update('none');
     }
@@ -59,8 +53,8 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) {
 
     #components = new Array<InternalComponent>();
     append(component: Component) {
-        const compo     = component as unknown as InternalComponent;
-        compo.insertIsPending = true;
+        const compo     = component as InternalComponent;
+        compo[IS_INSERT_PENDING] = true;
         this.#components.push(compo);
     }
 
@@ -71,5 +65,9 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) {
     }
     //TODO: remove component.
 }
+
+export abstract class InternalChart extends ChartJS {
+    abstract override readonly _chart: Chart;
+};
 
 export default ChartJS;
