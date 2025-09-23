@@ -33,11 +33,16 @@ export default class BaseComponent extends Component {
             (this.#chart as InternalChart).requestUpdate();
     }
 
-    protected onInsert(chart: Chart) {
+    protected insert(chart: Chart) {
         this.#chart = chart;
+        this.onInsert(chart);
     }
+    protected onInsert(chart: Chart) {}
 
     //TODO: check if pending...
+    protected update() {
+        this.onUpdate(this.#chart!);
+    }
     protected onUpdate(chart: Chart) {}
 }
 
