@@ -21,7 +21,6 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) {
     }
 
     protected override onUpdate() {
-
         for(let i = 0; i < this.#components.length; ++i) {
             const compo = this.#components[i];
             if( compo[IS_INSERT_PENDING] === true ) {

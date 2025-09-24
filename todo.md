@@ -1,35 +1,46 @@
 ## Features
 
-- 6 curves to add
+- 5/8 curves to add (?)
 - get tests ?
 
-- scale : beforeChartUpdate.
+- scale : beforeUpdate()
 
 ## Interactive
 
 - name + get component/dataset by name ?
 
-- 5 components to add (zoom, datalabel, tooltip)
+- 3 components to add (zoom, datalabel, tooltip)
 - onRemove()
-- properties : value as function or signal-compatible object.
-- SharedProperties (how ?)
 - Update ChartHTML
 
 ## Usage
 
 - properties = null => set default.
+- setProperty + setProperties
 
-- "@ChartJS".
 - doc (ofc)
 - other node manipulation fonctions (.remove(), children, etc).
 
-- setProperty + setProperties
-
 - Line constructor : move out somehow ?
-    - how to generalize ???
-    -> name of the prop + how to recognize it ???
+    - how to generalize / reuse ???
+        -> name of the props
+        -> how to distinguish props ?
 
 ## Performances
 
 - onUpdate : check if pending.
 - getParsedData : use cache ?
+- copy-on-write ? (overkill for simple components ?)
+
+Copy on write
+=============
+-> Component <-> logic (?)
+    -> Fct can be called with new...
+        -> onInsert(g)
+        -> onUpdate(g)
+        -> internal "data" (potentially)
+        -> Properties are forwarded ?
+    -> could have additional props...
+-> Sync
+    -> Graph <- SHost (RO) <-> SRef (act like graph, signalSync) <-> Component.clone()
+    -> Graph <- SHost (RO) <-> SRef (signal sync) <-> logic.clone() ?

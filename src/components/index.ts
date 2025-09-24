@@ -4,8 +4,12 @@ import { Cstr } from "@misc/types/Cstr";
 import Component from "../Component";
 import { InternalChart } from "../Chart";
 
+let id = 0;
+
 // extends required as we have protected members.
 export default class BaseComponent extends Component {
+
+    id = ++id;
 
     static Defaults = {};
     static readonly Properties = buildProperties(BaseComponent.Defaults);
