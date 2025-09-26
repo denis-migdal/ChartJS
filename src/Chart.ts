@@ -24,13 +24,14 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) {
         for(let i = 0; i < this.#components.length; ++i) {
             const compo = this.#components[i];
             if( compo[IS_INSERT_PENDING] === true ) {
+                compo.setUpdaterCtler(this);
                 compo.insert(this);
                 compo[IS_INSERT_PENDING] = false;
             }
         }
 
         for(let i = 0; i < this.#components.length; ++i)
-            this.#components[i].update();
+            this.#components[i].update(this);
 
         this._chart.update('none');
     }
