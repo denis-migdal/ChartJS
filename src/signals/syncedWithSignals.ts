@@ -49,7 +49,7 @@ class SyncedWithSignalRef<T extends BaseComponent, S extends Signal<any>[]> impl
     requestUpdate() {
         this.#dirty = true;
         for(let i = 0; i < this.#hosts.length; ++i)
-            this.#hosts[i].requestUpdate();
+            (this.#hosts[i] as any).requestUpdate();
     }
 
     removeChild<T extends Component>(child: T): T {
@@ -104,7 +104,16 @@ class SyncedWithSignalHost<T extends BaseComponent, S extends Signal<any>[]> ext
         return this.#ref.name;
     }
 
-    requestUpdate() {
+    #updateRequested = true;
+    get updateRequested() {
+        return this.#updateRequested;
+    }
+
+    protected requestUpdate() {
+        //if( this.#updateRequested === true )
+        //    return;
+        this.#updateRequested = true;
+
         if( this.#parent !== null)
             this.#parent.requestUpdate();
     }
@@ -125,6 +134,9 @@ class SyncedWithSignalHost<T extends BaseComponent, S extends Signal<any>[]> ext
     }
 
     protected override _update(chart: InternalChart): void {
+
+        this.#updateRequested = false;
+
         // @ts-ignore
         return this.#ref.update(chart);
     }

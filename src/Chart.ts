@@ -33,8 +33,10 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false})
             }
         }
 
-        for(let i = 0; i < this.#components.length; ++i)
-            this.#components[i]._update(this);
+        for(let i = 0; i < this.#components.length; ++i) {
+            if( this.#components[i].updateRequested )
+                this.#components[i]._update(this);
+        }
 
         this._chart.update('none');
     }

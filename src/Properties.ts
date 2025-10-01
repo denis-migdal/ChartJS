@@ -1,3 +1,4 @@
+import { InternalComponent } from "./Component";
 import type Component from "./components";
 
 type PropertiesDescriptor = Record<string, any>;
@@ -22,10 +23,30 @@ export function buildProperties<T extends PropertiesDescriptor>(defaults: T) {
 
         #values: Partial<T> = {};
 
+        onValueChange() {
+            (this.#parent as any).requestUpdate();
+        }
+
+        clearValue<K extends keyof T>(propname: K) {
+            delete this.#values[propname];
+            this.onValueChange();
+            return this;
+        }
+
+        setValues<P extends Partial<T>>(vals: P) {
+            for(let propname in vals)
+                this.#values[propname] = vals[propname];
+            
+            this.onValueChange();
+
+            return this;
+        }
+
         setValue<K extends keyof T>(propname: K, propval: T[K]) {
-            //TODO: check val...
+            
             this.#values[propname] = propval;
-            this.#parent.requestUpdate();
+            
+            this.onValueChange();
 
             return this;
         }

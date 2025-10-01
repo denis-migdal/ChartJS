@@ -12,12 +12,8 @@
 
 ## Usage
 
-- properties = null => set default.
-- setProperty + setProperties
-
 - doc (ofc)
 
 ## Performances
 
-- onUpdate : check if pending.
 - getParsedData : use cache ?

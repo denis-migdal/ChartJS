@@ -57,6 +57,20 @@ export default class BaseComponent extends Component {
     readonly defaults!: typeof BaseComponent.Defaults; // for typing purposes.
     readonly properties = new (this.constructor as typeof BaseComponent).Properties(this) as Properties<this["defaults"]>;
 
+    getProperty<T extends keyof this["defaults"]>(propname: T) {
+        this.properties.getValue(propname);
+    }
+    setProperty<T extends keyof this["defaults"]>(propname: T,
+                                                  value: this["defaults"][T]) {
+        this.properties.setValue(propname, value);
+    }
+    setProperties<T extends Partial<this["defaults"]>>(properties: T) {
+        this.properties.setValues(properties);
+    }
+    clearProperty<T extends keyof this["defaults"]>(propname: T) {
+        this.properties.clearValue(propname);
+    }
+
     constructor(opts: Record<string, any> = {}) {
         super(); // useless
         for(let k in opts) {
@@ -83,7 +97,16 @@ export default class BaseComponent extends Component {
         this.#parent = parent;
     }
 
-    requestUpdate() {
+    #updateRequested = true;
+    get updateRequested() {
+        return this.#updateRequested;
+    }
+
+    protected requestUpdate() {
+        //if( this.#updateRequested === true )
+        //    return;
+        this.#updateRequested = true;
+
         if( this.#parent !== null)
             this.#parent.requestUpdate();
     }
@@ -107,6 +130,7 @@ export default class BaseComponent extends Component {
 
     //TODO: check if pending...
     protected _update(chart: Chart) {
+        this.#updateRequested = false;
         this.onUpdate(chart!);
     }
     protected onUpdate(chart: Chart) {}

@@ -16,6 +16,8 @@ export default abstract class Component {
     readonly abstract parent: ComponentParent|null;
     readonly abstract name  : string|null;
 
+    readonly abstract updateRequested: boolean;
+
     protected abstract _insert(chart: Chart): void;
     protected abstract _remove(chart: Chart): void;
     protected abstract _update(chart: Chart): void;
