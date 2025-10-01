@@ -13,6 +13,8 @@ chart.addLine("my line", [[0,0], [1,1]])
      .addLine([[0,1], [1,0]], {color: "red"});
 ```
 
+![](https://raw.githubusercontent.com/denis-migdal/ChartJS/refs/heads/master/example.png)
+
 Graphs are aggregations of components (datasets, scales, etc) you can add or remove:
 - `chart.addX(...)`: add a component `X` to the graph.
 - `chart.createX(...)`: idem `addX` but returns the created component.
