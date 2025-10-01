@@ -21,18 +21,34 @@ Graphs are aggregations of components (datasets, scales, etc) you can add or rem
 - `chart.getComponent(name)`: returns the component named `name`.
 - `chart.getComponentNames()`: returns the names of the graph's components.
 
-Components are usually created with the following arguments: `([name,][data,...][opts])` and have the following properties :
+Components are usually created with the following arguments: `([name,][data,...][opts])`. They have the following properties:
 - `c.name`: the component name.
 - `c.parent`: the component parent (usually the graph).
 - `c.remove()`: remove the component from its parent.
 - `c.clone()`: clone the component.
 
-Some components has properties you can manipulate with :
+Some components has properties you can manipulate with:
 - `c.properties`
 - `c.getProperty(name)`
 - `c.setProperty(name, value)`
 - `c.setProperties(props)`
 - `c.clearProperties(name)`
+
+### Dataset
+
+Dataset represents data shown in your graph (e.g. line, histogram, etc).
+
+| Property | Type | Default |
+------------------------- 
+| `color` | `string` | `"black"` |
+| `type` | `string` | `"scatter"` |
+| `data` | `[number,number][]` | `[]` |
+
+#### Line
+
+| Property | Type | Default |
+------------------------- 
+| `showPoints` | `boolean` | `false` |
 
 ### Use the graph
 
