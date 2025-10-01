@@ -58,7 +58,7 @@ Represents a vertical/horizontal line.
 
 | Property | Type | Default |
 |----------|------|---------|
-| `data` | `number|null` | `null` |
+| `data` | `number\|null` | `null` |
 
 ### Scale
 
