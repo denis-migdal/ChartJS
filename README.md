@@ -67,10 +67,10 @@ Represents a scale. If labels are given, behave as a category scale.
 | Property | Type | Default |
 |----------|------|---------|
 | `name` | `string` | mandatory |
-| `pos` | `null|"left"|"right"|"top"|"bottom"` | `null` |
-| `min` | `null|number` | `null` |
-| `max` | `null|number` | `null` |
-| `labels` | `null|string[]` | `null` |
+| `pos` | `null\|"left"\|"right"\|"top"\|"bottom"` | `null` |
+| `min` | `null\|number` | `null` |
+| `max` | `null\|number` | `null` |
+| `labels` | `null\|string[]` | `null` |
 
 ### Use the graph
 
