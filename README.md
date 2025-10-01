@@ -39,7 +39,7 @@ Some components has properties you can manipulate with:
 Dataset represents data shown in your graph (e.g. line, histogram, etc).
 
 | Property | Type | Default |
-------------------------- 
+|----------|------|---------|
 | `color` | `string` | `"black"` |
 | `type` | `string` | `"scatter"` |
 | `data` | `[number,number][]` | `[]` |
@@ -47,7 +47,7 @@ Dataset represents data shown in your graph (e.g. line, histogram, etc).
 #### Line
 
 | Property | Type | Default |
-------------------------- 
+|----------|------|---------|
 | `showPoints` | `boolean` | `false` |
 
 ### Use the graph
