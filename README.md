@@ -44,13 +44,13 @@ ChartJS++ is compatible with signals (you may need to use an adapter).
 
 ```ts
 // a trivial implementation of signals.
-const data = new TrivialSignal<number>();
+const dataSignal = new TrivialSignal<number>();
 
 const hline = syncedWithSignals(
   // the target component (will be cloned):
   new HLine(),
   // the signal(s) to listen:
-  data,
+  dataSignal,
   // the update function:
   (target, data) => {
     target.properties.data = data;
@@ -60,8 +60,8 @@ const hline = syncedWithSignals(
 // clone() is optimized to prevent unnecessary copies and updates.
 graph.import(hline);
 
-data.value = 0;
-setInterval( () => ++data.value, 1000);
+dataSignal.value = 0;
+setInterval( () => ++dataSignal.value, 1000);
 ```
 
 ### Dataset
