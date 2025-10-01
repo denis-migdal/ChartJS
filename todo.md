@@ -9,11 +9,3 @@
 
 - 3 components to add (zoom, datalabel, tooltip)
 - Update ChartHTML
-
-## Usage
-
-- doc (ofc)
-
-## Performances
-
-- getParsedData : use cache ?

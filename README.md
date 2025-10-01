@@ -38,6 +38,29 @@ Some components has properties you can manipulate:
 - `c.setProperties(props)`
 - `c.clearProperties(name)`
 
+### Signals
+
+ChartJS++ is compatible with signals (you may need to use an adapter).
+
+```ts
+// a trivial implementation of signals.
+const data = new TrivialSignal<number>();
+
+const hline = syncedWithSignals(
+  // the target component (will be cloned):
+  new HLine(),
+  // the signal(s) to listen:
+  data,
+  // the update function:
+  (target, data) => {
+    target.properties.data = data;
+  }
+);
+
+// clone() is optimized to prevent unnecessary copies and updates.
+graph.import(hline);
+```
+
 ### Dataset
 
 Represents data shown in your graph (e.g. line, histogram, etc).
