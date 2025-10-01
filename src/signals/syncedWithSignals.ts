@@ -1,5 +1,5 @@
 import { InternalChart } from "../Chart";
-import Component, { UpdateController } from "../Component";
+import Component, { ComponentParent } from "../Component";
 import BaseComponent from "../components";
 import { Signal } from "./TrivialSignal";
 
@@ -11,7 +11,7 @@ type GetSignalValues<T extends any[]> = {
 type Callback<T extends BaseComponent,
               S extends Signal<any>[]> = (target: T, ...params: GetSignalValues<S>) => void;
 
-class SyncedWithSignalRef<T extends BaseComponent, S extends Signal<any>[]> {
+class SyncedWithSignalRef<T extends BaseComponent, S extends Signal<any>[]> implements ComponentParent {
 
     readonly #target  : T;
     readonly #signals : S;
@@ -25,8 +25,6 @@ class SyncedWithSignalRef<T extends BaseComponent, S extends Signal<any>[]> {
     constructor(target: T, signals: S, callback: Callback<T, S>) {
 
         this.#target = target;
-        // (target as any as InternalComponent).setUpdaterCtler(this);
-        // no needs -> is RO...
 
         this.#callback = callback;
         this.#signals  = signals;
@@ -50,9 +48,17 @@ class SyncedWithSignalRef<T extends BaseComponent, S extends Signal<any>[]> {
             this.#hosts[i].requestUpdate();
     }
 
+    removeChild<T extends Component>(child: T): T {
+        throw new Error("not implemented");
+    }
+
+    remove(chart: InternalChart) {
+        // @ts-ignore
+        return this.#target._remove(chart);
+    }
     insert(chart: InternalChart) {
         // @ts-ignore
-        return this.#target.insert(chart);
+        return this.#target._insert(chart);
     }
     update(chart: InternalChart): void {
 
@@ -64,7 +70,7 @@ class SyncedWithSignalRef<T extends BaseComponent, S extends Signal<any>[]> {
 
         this.#callback(this.#target, ...this.#values);
         // @ts-ignore
-        return this.#target.update(chart);
+        return this.#target._update(chart);
     }
 }
 
@@ -84,20 +90,33 @@ class SyncedWithSignalHost<T extends BaseComponent, S extends Signal<any>[]> ext
         return new SyncedWithSignalHost(this.#ref);
     }
 
-    #updateControler: UpdateController|null = null;
-    protected override setUpdaterCtler(updateCtler: UpdateController): void {
-        this.#updateControler = updateCtler;
-    }
-    requestUpdate() {
-        if( this.#updateControler !== null)
-            this.#updateControler.requestUpdate();
+    #parent: ComponentParent|null = null;
+    get parent(): ComponentParent|null { return this.#parent; }
+    protected set parent(parent: ComponentParent) {
+        this.#parent = parent;
     }
 
-    protected override insert(chart: InternalChart) {
+    requestUpdate() {
+        if( this.#parent !== null)
+            this.#parent.requestUpdate();
+    }
+    remove() {
+        if( this.#parent !== null) {
+            this.#parent.removeChild(this);
+            this.#parent = null;
+        }
+    }
+
+    protected override _insert(chart: InternalChart) {
         // @ts-ignore
         return this.#ref.insert(chart);
     }
-    protected override update(chart: InternalChart): void {
+    protected override _remove(chart: InternalChart): void {
+        // @ts-ignore
+        return this.#ref.remove(chart);
+    }
+
+    protected override _update(chart: InternalChart): void {
         // @ts-ignore
         return this.#ref.update(chart);
     }

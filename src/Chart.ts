@@ -1,12 +1,12 @@
 import WithUpdate from "@misc/WithUpdate";
 
-import { IS_INSERT_PENDING, type default as Component, type InternalComponent } from "./Component";
+import { type ComponentParent, IS_INSERT_PENDING, type default as Component, type InternalComponent } from "./Component";
 
 import {Chart} from 'chart.js';
 
 type Canvas = any;
 
-export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) {
+export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) implements ComponentParent {
 
     readonly canvas  : Canvas;
     protected _chart!: Chart;
@@ -24,14 +24,14 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) {
         for(let i = 0; i < this.#components.length; ++i) {
             const compo = this.#components[i];
             if( compo[IS_INSERT_PENDING] === true ) {
-                compo.setUpdaterCtler(this);
-                compo.insert(this);
+                compo._insert(this);
                 compo[IS_INSERT_PENDING] = false;
+                console.warn("ok", compo);
             }
         }
 
         for(let i = 0; i < this.#components.length; ++i)
-            this.#components[i].update(this);
+            this.#components[i]._update(this);
 
         this._chart.update('none');
     }
@@ -54,7 +54,16 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) {
     #components = new Array<InternalComponent>();
     append(component: Component) {
         const compo     = component as InternalComponent;
+        if( compo.parent !== null) {
+            console.warn("c remove");
+            compo.remove();
+        }
+
+        console.warn("c append");
+
         compo[IS_INSERT_PENDING] = true;
+        compo.parent = this;
+
         this.#components.push(compo);
     }
 
@@ -63,7 +72,19 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) {
         this.append(clone);
         return clone;
     }
-    //TODO: remove component.
+
+    removeChild<T extends Component>(child: T): T {
+
+        const compo = child as any as InternalComponent;
+        if( compo[IS_INSERT_PENDING] !== true )
+            compo._remove(this);
+
+        compo.parent = null;
+
+        this.requestUpdate();
+
+        return child;
+    }
 }
 
 export abstract class InternalChart extends ChartJS {

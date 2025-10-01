@@ -1,8 +1,7 @@
 import { buildProperties, Properties } from "../Properties";
 import type Chart from "../Chart";
 import { Cstr } from "@misc/types/Cstr";
-import Component, { UpdateController } from "../Component";
-import { InternalChart } from "../Chart";
+import Component, { ComponentParent } from "../Component";
 
 let id = 0;
 
@@ -31,23 +30,38 @@ export default class BaseComponent extends Component {
         return new this.constructor(this.properties);
     }
 
-    #updateCtrler: UpdateController|null = null;
+    #parent: ComponentParent|null = null;
+    get parent(): ComponentParent|null {
+        return this.#parent;
+    }
+    protected set parent(parent: ComponentParent) {
+        this.#parent = parent;
+    }
+
     requestUpdate() {
-        if( this.#updateCtrler !== null)
-            this.#updateCtrler.requestUpdate();
+        if( this.#parent !== null)
+            this.#parent.requestUpdate();
     }
 
-    protected setUpdaterCtler(updateCtrler: UpdateController) {
-        this.#updateCtrler = updateCtrler;
-    }
-
-    protected insert(chart: Chart) {
+    protected _insert(chart: Chart) {
         this.onInsert(chart);
     }
     protected onInsert(chart: Chart) {}
 
+    remove() {
+        if( this.#parent !== null) {
+            this.#parent.removeChild(this);
+            this.#parent = null;
+        }
+    }
+
+    protected _remove(chart: Chart) {
+        this.onRemove(chart);
+    }
+    protected onRemove(chart: Chart) {}
+
     //TODO: check if pending...
-    protected update(chart: Chart) {
+    protected _update(chart: Chart) {
         this.onUpdate(chart!);
     }
     protected onUpdate(chart: Chart) {}

@@ -38,6 +38,15 @@ export default class Dataset extends WithExtraProps(Component, {
         (chart as InternalChart)._chart.data.datasets.push(this.dataset);
     }
 
+    protected override onRemove(chart: Chart) {
+        super.onRemove(chart);
+        const datasets = (chart as InternalChart)._chart.data.datasets;
+        const idx = datasets.indexOf(this.dataset as any);
+        if( idx === -1)
+            throw new Error("Child not found");
+        datasets.splice(idx, 1);
+    }
+
     protected override onUpdate(chart: Chart) {
         //TODO: check if pending...
         super.onUpdate(chart);
