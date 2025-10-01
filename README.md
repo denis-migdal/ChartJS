@@ -36,7 +36,7 @@ Some components has properties you can manipulate with:
 
 ### Dataset
 
-Dataset represents data shown in your graph (e.g. line, histogram, etc).
+Represents data shown in your graph (e.g. line, histogram, etc).
 
 | Property | Type | Default |
 |----------|------|---------|
@@ -46,9 +46,19 @@ Dataset represents data shown in your graph (e.g. line, histogram, etc).
 
 #### Line
 
+Represents a curve/line.
+
 | Property | Type | Default |
 |----------|------|---------|
 | `showPoints` | `boolean` | `false` |
+
+#### VLine/HLine
+
+Represents a vertical/horizontal line.
+
+| Property | Type | Default |
+|----------|------|---------|
+| `data` | `number|null` | `null` |
 
 ### Use the graph
 
