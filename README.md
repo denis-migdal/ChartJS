@@ -74,12 +74,22 @@ Represents data shown in your graph (e.g. line, histogram, etc).
 | `type` | `string` | `"scatter"` |
 | `data` | `[number,number][]` | `[]` |
 
+
+#### Points
+
+Represents a set of points.
+
+| Property | Type | Default |
+|----------|------|---------|
+| `type` | `"scatter"` | `"scatter"` |
+
 #### Line
 
 Represents a curve/line.
 
 | Property | Type | Default |
 |----------|------|---------|
+| `type` | `"scatter"` | `"scatter"` |
 | `showPoints` | `boolean` | `false` |
 
 #### VLine/HLine
@@ -96,7 +106,7 @@ Represents a scale. If labels are given, behave as a category scale.
 
 | Property | Type | Default |
 |----------|------|---------|
-| `name` | `string` | mandatory |
+| `name` | `string` | required |
 | `pos` | `null\|"left"\|"right"\|"top"\|"bottom"` | `null` |
 | `min` | `null\|number` | `null` |
 | `max` | `null\|number` | `null` |
