@@ -1,32 +1,19 @@
-import { WithExtraProps } from "..";
+import { ComponentArgs, WithExtraProps } from "..";
 import Line from "./Line";
+import { datasetArgsParser } from ".";
 
-//TODO: move out...
-type HLineData = null|number;
-type HLineOpts = Partial<(typeof HLine)["Defaults"]>;
-
-function parseHLineArgs(data_or_opts?: HLineData|HLineOpts,
-                                opts?: HLineOpts) {
-    if( data_or_opts === null || typeof data_or_opts === "number" ) {
-        if( opts === undefined)
-            opts = {};
-        opts.data = data_or_opts;
-    } else {
-        opts = data_or_opts;
-    }
-
-    return opts;
-}
+type ArgsData = number|null;
+type Args     = ComponentArgs<HLine, [ArgsData]>;
 
 // https://github.com/microsoft/TypeScript/issues/62395
 export default class HLine extends WithExtraProps(Line, {
-            data: null as HLineData,
+            data: null as ArgsData,
             showPoints: false as const,
         }) {
 
     // one line due to ConstructorParem use...
-    constructor(...args: [HLineData]|[HLineOpts]|[HLineData, HLineOpts]) {
-        super( parseHLineArgs(...args) ); // TODO: somehow give condition...
+    constructor(...args: Args) {
+        super( datasetArgsParser(...args) ); // TODO: somehow give condition...
     }
 
     // fix instance properties type.
@@ -48,20 +35,18 @@ export default class HLine extends WithExtraProps(Line, {
 
 import ChartJS from "../../Chart";
 
-type HLineArgs = ConstructorParameters<typeof HLine>;
-
 declare module "../../Chart" {
     interface ChartJS {
-        addHLine   (...args: HLineArgs): ChartJS;
-        createHLine(...args: HLineArgs): HLine;
+        addHLine   (...args: Args): ChartJS;
+        createHLine(...args: Args): HLine;
     }
 }
 
-ChartJS.prototype.addHLine = function(...args: HLineArgs) {
+ChartJS.prototype.addHLine = function(...args: Args) {
     this.createHLine(...args);
     return this;
 }
-ChartJS.prototype.createHLine = function(...args: HLineArgs) {
+ChartJS.prototype.createHLine = function(...args: Args) {
     const line = new HLine(...args);
     this.append(line);
     return line;

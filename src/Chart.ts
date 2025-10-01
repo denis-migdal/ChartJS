@@ -6,13 +6,17 @@ import {Chart} from 'chart.js';
 
 type Canvas = any;
 
-export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) implements ComponentParent {
+export class ChartJS extends WithUpdate(Object, {selfAsTarget: false})
+                     implements ComponentParent {
 
     readonly canvas  : Canvas;
     protected _chart!: Chart;
 
-    constructor(canvas: Canvas = document.createElement('canvas')) {
+    constructor(canvas: Canvas|null = null) {
         super();
+
+        if( canvas === null)
+            canvas = document.createElement('canvas')
 
         this.canvas = canvas;
         this.setVisibilityTarget(canvas);
@@ -26,7 +30,6 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) implement
             if( compo[IS_INSERT_PENDING] === true ) {
                 compo._insert(this);
                 compo[IS_INSERT_PENDING] = false;
-                console.warn("ok", compo);
             }
         }
 
@@ -54,12 +57,8 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) implement
     #components = new Array<InternalComponent>();
     append(component: Component) {
         const compo     = component as InternalComponent;
-        if( compo.parent !== null) {
-            console.warn("c remove");
+        if( compo.parent !== null)
             compo.remove();
-        }
-
-        console.warn("c append");
 
         compo[IS_INSERT_PENDING] = true;
         compo.parent = this;
@@ -84,6 +83,26 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false}) implement
         this.requestUpdate();
 
         return child;
+    }
+
+    getComponentNames() {
+        const names = new Array<string>(this.#components.length);
+        let offset = 0;
+        for(let i = 0; i < this.#components.length; ++i)
+            if( this.#components[i].name !== null)
+                names[offset++] = this.#components[i].name!;
+
+        names.length = offset;
+
+        return names;
+    }
+
+    getComponent<T extends Component>(name: string): T|null {
+        for(let i = 0; i < this.#components.length; ++i)
+            if( this.#components[i].name === name)
+                return this.#components[i] as any;
+
+        return null;
     }
 }
 

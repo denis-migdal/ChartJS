@@ -3,17 +3,58 @@ import type Chart from "../Chart";
 import { Cstr } from "@misc/types/Cstr";
 import Component, { ComponentParent } from "../Component";
 
-let id = 0;
+export type ComponentArgs<T extends {defaults: Record<string, any>},
+                          Prefix extends any[] = []> = 
+    | [string, ...Prefix, Partial<T["defaults"]>]
+    | [string, ...Prefix]
+    | [string, Partial<T["defaults"]>]
+    | [string]
+    | [...Prefix, Partial<T["defaults"]>]
+    | [Partial<T["defaults"]>]
+    | [...Prefix]
+    | [];
+
+type ArgsPrefix<T> = T extends ComponentArgs<infer U, infer V> ? V : never;
+type ArgsOpts<T>   = T extends ComponentArgs<infer U, infer V> ? Partial<U> : never;
+
+export function buildArgsParser<T extends ComponentArgs<any,any>>(
+                            parsePrefix: ((   opts: ArgsOpts<T>,
+                                           ...args: ArgsPrefix<T>) => void)
+                                        | null = null ) {
+
+    return (...args: T) => {
+        let opts: Record<string, any> = {};
+        let start = 0;
+        let end = args.length;
+
+        const last = args[args.length-1]; // out of index gives undefined
+        if( typeof last === "object" && ! Array.isArray(last) ) {
+            opts = last;
+            --end;
+        }
+
+        if( typeof args[0] === "string") {
+            // @ts-ignore
+            opts.name = args[0];
+            ++start;
+        }
+
+        if( start !== end && parsePrefix !== null)
+            parsePrefix( opts as any, ...args.slice(start, end) as any );
+
+        return opts;
+    }
+}
 
 // extends required as we have protected members.
 export default class BaseComponent extends Component {
 
-    id = ++id;
-
-    static Defaults = {};
+    static Defaults = {
+        name: null as string|null
+    };
     static readonly Properties = buildProperties(BaseComponent.Defaults);
 
-    readonly defaults!: {}; // for typing purposes.
+    readonly defaults!: typeof BaseComponent.Defaults; // for typing purposes.
     readonly properties = new (this.constructor as typeof BaseComponent).Properties(this) as Properties<this["defaults"]>;
 
     constructor(opts: Record<string, any> = {}) {
@@ -28,6 +69,10 @@ export default class BaseComponent extends Component {
     clone(): this {
         // @ts-ignore
         return new this.constructor(this.properties);
+    }
+
+    get name() {
+        return this.properties.name;
     }
 
     #parent: ComponentParent|null = null;

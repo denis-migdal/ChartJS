@@ -1,4 +1,4 @@
-import Component, { WithExtraProps } from ".";
+import Component, { buildArgsParser, ComponentArgs, WithExtraProps } from ".";
 import { InternalChart } from "../Chart";
 
 import {CategoryScale, Chart, LinearScale} from 'chart.js';
@@ -9,17 +9,11 @@ Chart.register([
   CategoryScale
 ]);
 
+// name option is required.
 type ScaleOpts = Partial<(typeof Scale)["Defaults"]>;
+type Args = [string]|[string, ScaleOpts]|[ScaleOpts & {name: string}];
 
-function parseScaleArgs(name_or_opts: string|ScaleOpts = {}, opts: ScaleOpts = {}) {
-
-    if( typeof name_or_opts === 'string')
-        opts.name = name_or_opts;
-    else
-        opts = name_or_opts;
-
-    return opts;
-}
+const parser = buildArgsParser();
 
 function buildLinearScale() {
     return {
@@ -66,7 +60,7 @@ export default class Scale extends WithExtraProps(Component, {
         }) {
 
     constructor(...args: [string]|[string, ScaleOpts]|[ScaleOpts & {name: string}]) {
-        super( parseScaleArgs(...args) );
+        super( parser(...args) );
     }
 
     protected override onUpdate(chart: ChartJS): void {
@@ -118,25 +112,21 @@ export default class Scale extends WithExtraProps(Component, {
         */
 }
 
-
-
 import ChartJS from "../Chart";
-
-type ScaleArgs = ConstructorParameters<typeof Scale>;
 
 declare module "../Chart" {
     interface ChartJS {
-        addScale   (...args: ScaleArgs): ChartJS;
-        createScale(...args: ScaleArgs): Scale;
+        addScale   (...args: Args): ChartJS;
+        createScale(...args: Args): Scale;
     }
 }
 
 // we keep type checks
-ChartJS.prototype.addScale = function(...args: ScaleArgs) {
+ChartJS.prototype.addScale = function(...args: Args) {
     this.createScale(...args);
     return this;
 }
-ChartJS.prototype.createScale = function(...args: ScaleArgs) {
+ChartJS.prototype.createScale = function(...args: Args) {
     const scale = new Scale(...args);
     this.append(scale);
     return scale;

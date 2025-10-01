@@ -14,6 +14,7 @@ export default abstract class Component {
     abstract clone(): this;
     abstract remove(): void;
     readonly abstract parent: ComponentParent|null;
+    readonly abstract name  : string|null;
 
     protected abstract _insert(chart: Chart): void;
     protected abstract _remove(chart: Chart): void;

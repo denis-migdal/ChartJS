@@ -1,32 +1,19 @@
-import { WithExtraProps } from "..";
+import { ComponentArgs, WithExtraProps } from "..";
 import Line from "./Line";
+import { datasetArgsParser } from ".";
 
-//TODO: move out...
-type VLineData = null|number;
-type VLineOpts = Partial<(typeof VLine)["Defaults"]>;
-
-function parseVLineArgs(data_or_opts?: VLineData|VLineOpts,
-                                opts?: VLineOpts) {
-    if( data_or_opts === null || typeof data_or_opts === "number" ) {
-        if( opts === undefined)
-            opts = {};
-        opts.data = data_or_opts;
-    } else {
-        opts = data_or_opts;
-    }
-
-    return opts;
-}
+type ArgsData = number|null;
+type Args     = ComponentArgs<VLine, [ArgsData]>;
 
 // https://github.com/microsoft/TypeScript/issues/62395
 export default class VLine extends WithExtraProps(Line, {
-            data: null as VLineData,
+            data: null as ArgsData,
             showPoints: false as const,
         }) {
 
     // one line due to ConstructorParem use...
-    constructor(...args: [VLineData]|[VLineOpts]|[VLineData, VLineOpts]) {
-        super( parseVLineArgs(...args) ); // TODO: somehow give condition...
+    constructor(...args: Args) {
+        super( datasetArgsParser(...args) ); // TODO: somehow give condition...
     }
 
     // fix instance properties type.
@@ -48,20 +35,18 @@ export default class VLine extends WithExtraProps(Line, {
 
 import ChartJS from "../../Chart";
 
-type VLineArgs = ConstructorParameters<typeof VLine>;
-
 declare module "../../Chart" {
     interface ChartJS {
-        addVLine   (...args: VLineArgs): ChartJS;
-        createVLine(...args: VLineArgs): VLine;
+        addVLine   (...args: Args): ChartJS;
+        createVLine(...args: Args): VLine;
     }
 }
 
-ChartJS.prototype.addVLine = function(...args: VLineArgs) {
+ChartJS.prototype.addVLine = function(...args: Args) {
     this.createVLine(...args);
     return this;
 }
-ChartJS.prototype.createVLine = function(...args: VLineArgs) {
+ChartJS.prototype.createVLine = function(...args: Args) {
     const line = new VLine(...args);
     this.append(line);
     return line;

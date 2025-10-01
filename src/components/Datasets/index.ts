@@ -1,7 +1,15 @@
 import { ChartDataset, ChartTypeRegistry } from "chart.js";
-import Component, { WithExtraProps } from "..";
+import Component, { buildArgsParser, WithExtraProps } from "..";
 import type Chart from "../../Chart";
 import { InternalChart } from "../../Chart";
+
+
+export const datasetArgsParser = buildArgsParser( (opts: Record<string,any>,
+                                                   data?: unknown,
+                                                   ..._) => {
+    opts.data = data;
+});
+
 
 // https://github.com/microsoft/TypeScript/issues/62395
 export default class Dataset extends WithExtraProps(Component, {

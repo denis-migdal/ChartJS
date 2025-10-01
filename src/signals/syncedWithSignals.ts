@@ -38,6 +38,10 @@ class SyncedWithSignalRef<T extends BaseComponent, S extends Signal<any>[]> impl
         this.requestUpdate();
     }
 
+    get name() {
+        return this.#target.name;
+    }
+
     addHost(host: SyncedWithSignalHost<T,S>) {
         this.#hosts.push(host);
     }
@@ -94,6 +98,10 @@ class SyncedWithSignalHost<T extends BaseComponent, S extends Signal<any>[]> ext
     get parent(): ComponentParent|null { return this.#parent; }
     protected set parent(parent: ComponentParent) {
         this.#parent = parent;
+    }
+
+    get name() {
+        return this.#ref.name;
     }
 
     requestUpdate() {
