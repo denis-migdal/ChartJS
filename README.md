@@ -27,7 +27,7 @@ Components are usually created with the following arguments: `([name,][data,...]
 - `c.remove()`: remove the component from its parent.
 - `c.clone()`: clone the component.
 
-Some components has properties you can manipulate with:
+Some components has properties you can manipulate:
 - `c.properties`
 - `c.getProperty(name)`
 - `c.setProperty(name, value)`
@@ -59,6 +59,18 @@ Represents a vertical/horizontal line.
 | Property | Type | Default |
 |----------|------|---------|
 | `data` | `number|null` | `null` |
+
+### Scale
+
+Represents a scale. If labels are given, behave as a category scale.
+
+| Property | Type | Default |
+|----------|------|---------|
+| `name` | `string` | mandatory |
+| `pos` | `null|"left"|"right"|"top"|"bottom"` | `null` |
+| `min` | `null|number` | `null` |
+| `max` | `null|number` | `null` |
+| `labels` | `null|string[]` | `null` |
 
 ### Use the graph
 
