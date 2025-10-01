@@ -1,5 +1,5 @@
 - 3/7 curves to add (?)
-- 3 components to add (zoom, datalabel, tooltip)
+- 2 components to add (datalabel, tooltip)
 
 - use scale (x,y) + hide scale... (position: x-hidden / y-hidden).
 

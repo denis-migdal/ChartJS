@@ -4,11 +4,7 @@ import Dataset, { datasetArgsParser } from ".";
 
 import {Chart, ScatterController, LineElement, PointElement} from 'chart.js';
 // Can't register plugins after graph creation...
-Chart.register([
-  ScatterController,
-  LineElement,
-  PointElement
-]);
+Chart.register(ScatterController, LineElement, PointElement);
 
 
 type ArgsData = [number, number][];

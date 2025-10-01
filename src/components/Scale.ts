@@ -4,10 +4,7 @@ import { InternalChart } from "../Chart";
 import {CategoryScale, Chart, LinearScale} from 'chart.js';
 
 // Can't register plugins after graph creation...
-Chart.register([
-  LinearScale,
-  CategoryScale
-]);
+Chart.register(LinearScale, CategoryScale);
 
 // name option is required.
 type ScaleOpts = Partial<(typeof Scale)["Defaults"]>;

@@ -64,6 +64,13 @@ dataSignal.value = 0;
 setInterval( () => ++dataSignal.value, 1000);
 ```
 
+### Zoom
+
+Enables to configure the zoom/pan of the graph:
+- `graph.setZoom(dir)` : dir is either `"x"`, `"y"`, `"xy"`, `false`.
+- `graph.resetZoom()`
+
+
 ### Dataset
 
 Represents data shown in your graph (e.g. line, histogram, etc).

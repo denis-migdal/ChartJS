@@ -49,6 +49,7 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false})
 				animation: false,
 				responsive: true,
 				maintainAspectRatio: false,
+                plugins: {}
             },
             data: {
                 datasets: []
