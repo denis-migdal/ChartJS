@@ -6,7 +6,9 @@
 
 ## Usage
 
-### In Browser mode (existing canvas)
+### Use the graph
+
+#### In Browser mode (existing canvas)
 
 ```ts
 const canvas = document.querySelector("canvas");
@@ -16,12 +18,10 @@ const chart = new Chart(canvas);
 // configure graph here.
 ```
 
-### In Browser mode (without existing canvas)
+#### In Browser mode (without existing canvas)
 
 ```ts
-const canvas = document.createElement("canvas");
-
-const chart = new Chart(canvas);
+const chart = new Chart();
 
 // configure graph here.
 
@@ -29,7 +29,7 @@ const chart = new Chart(canvas);
 document.body.append( chart.canvas );
 ```
 
-### In CLI mode
+#### In CLI mode
 
 ```ts
 // use https://github.com/Automattic/node-canvas/
@@ -63,8 +63,3 @@ https://github.com/timocov/dts-bundle-generator
 
 - npm-dts : not for bundled files.
 - npm-dts-webpack-plugin : not for multiple entries.
-
-## Utils (TODO: move)
-
-- IS_INTERACTIVE
-- WithUpdate()
