@@ -59,6 +59,9 @@ const hline = syncedWithSignals(
 
 // clone() is optimized to prevent unnecessary copies and updates.
 graph.import(hline);
+
+data.value = 0;
+setInterval( () => ++data.value, 1000);
 ```
 
 ### Dataset
