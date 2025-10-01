@@ -83,6 +83,14 @@ Represents a set of points.
 |----------|------|---------|
 | `type` | `"scatter"` | `"scatter"` |
 
+#### Bars
+
+Represents a bar. Works better with a category scale.
+
+| Property | Type | Default |
+|----------|------|---------|
+| `type` | `"bar"` | `"bar"` |
+
 #### Line
 
 Represents a curve/line.

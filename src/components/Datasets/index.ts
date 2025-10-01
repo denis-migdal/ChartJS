@@ -18,9 +18,9 @@ export default class Dataset extends WithExtraProps(Component, {
             type : "scatter"
         }) {
 
-    protected static createDataset<T extends keyof ChartTypeRegistry>(): ChartDataset<T> {
+    protected static createDataset<T extends keyof ChartTypeRegistry>(type: T = "scatter" as T): ChartDataset<T> {
         return {
-            type: "scatter",
+            type,
             data: []
         } as unknown as ChartDataset<T>;
     }
@@ -59,6 +59,6 @@ export default class Dataset extends WithExtraProps(Component, {
         //TODO: check if pending...
         super.onUpdate(chart);
         this.dataset.data = this.getParsedData();
-        this.dataset.borderColor = this.properties.getValue("color");
+        this.dataset.borderColor = this.dataset.backgroundColor = this.properties.getValue("color");
     }
 }
