@@ -6,6 +6,34 @@
 
 ## Usage
 
+```ts
+const chart = new Chart();
+
+chart.addLine("my line", [[0,0], [1,1]])
+     .addLine([[0,1], [1,0]], {color: "red"});
+```
+
+Graphs are aggregations of components (datasets, scales, etc) you can add or remove:
+- `chart.addX(...)`: add a component `X` to the graph.
+- `chart.createX(...)`: idem `addX` but returns the created component.
+- `chart.append(c)`: add the component `c` to the graph (will be removed from its previous parent).
+- `chart.import(c)`: add a clone of the component `c` to the graph.
+- `chart.getComponent(name)`: returns the component named `name`.
+- `chart.getComponentNames()`: returns the names of the graph's components.
+
+Components are usually created with the following arguments: `([name,][data,...][opts])` and have the following properties :
+- `c.name`: the component name.
+- `c.parent`: the component parent (usually the graph).
+- `c.remove()`: remove the component from its parent.
+- `c.clone()`: clone the component.
+
+Some components has properties you can manipulate with :
+- `c.properties`
+- `c.getProperty(name)`
+- `c.setProperty(name, value)`
+- `c.setProperties(props)`
+- `c.clearProperties(name)`
+
 ### Use the graph
 
 #### In Browser mode (existing canvas)

@@ -16,7 +16,7 @@ export default abstract class Component {
     readonly abstract parent: ComponentParent|null;
     readonly abstract name  : string|null;
 
-    readonly abstract updateRequested: boolean;
+    protected readonly abstract updateRequested: boolean;
 
     protected abstract _insert(chart: Chart): void;
     protected abstract _remove(chart: Chart): void;
@@ -30,6 +30,7 @@ export abstract class InternalComponent extends Component {
     abstract [IS_INSERT_PENDING]: boolean;
 
     abstract override parent: ComponentParent|null;
+    abstract override readonly updateRequested: boolean;
 
     abstract override _insert(chart: Chart): void;
     abstract override _remove(chart: Chart): void;
