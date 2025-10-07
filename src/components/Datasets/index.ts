@@ -71,16 +71,31 @@ export default class Dataset extends WithExtraProps(Component, {
     }
 }
 
-// @todo: remove @ts-ignore, better type check (?)
-export function registerDatasetType<T extends {new(...args: any[]): Component}>(Klass: T, name: string) {
+// ======== PLUGIN ===========
 
-    const    addMeth =    `add${name}`;
-    const createMeth = `create${name}`;
+import {Cstr} from "@misc/types/Cstr";
+
+type Add<T extends string> = `add${T}`;
+type Create<T extends string> = `create${T}`;
+type Filter<T> = (T extends Add<infer U> ? U : never) & (T extends Create<infer U> ? U : never);
+
+type ComponentNames = Filter<keyof Chart>;
+
+type ComponentName<T extends Cstr> = Exclude<keyof {
+    [K in ComponentNames as ReturnType<Chart[`create${K}`]> extends InstanceType<T> ? K : never]: true
+}, symbol|number>;
+
+export type WithDataset<T extends Cstr<Component>, N extends string> = Record<`create${N}`, (...args: ConstructorParameters<T>) => InstanceType<T>> & Record<`add${N}`, (...args: ConstructorParameters<T>) => Chart>;
+
+// @todo : verif add/create parameters with Cstr parameters (?).
+export function registerDatasetType<T extends Cstr<Component>>(Klass: T, name: ComponentName<T>) {
+
+    const    addMeth =    `add${name}` as const;
+    const createMeth = `create${name}` as const;
 
     // @ts-ignore
     Chart.prototype[createMeth] = function(...args: any[]) {
         const dataset = new Klass(...args);
-        // @ts-ignore
         this.append(dataset);
         return dataset;
     }

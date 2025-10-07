@@ -1,6 +1,6 @@
 import { ChartDataset } from "chart.js";
 import { ComponentArgs, WithExtraProps } from "..";
-import Dataset, { datasetArgsParser, registerDatasetType } from ".";
+import Dataset, { datasetArgsParser, registerDatasetType, WithDataset } from ".";
 
 import {Chart, ScatterController, PointElement} from 'chart.js';
 // Can't register plugins after graph creation...
@@ -8,7 +8,6 @@ Chart.register(ScatterController, PointElement);
 
 
 type ArgsData = [number, number][];
-type Args     = ComponentArgs<Points, [ArgsData]>;
 
 // https://github.com/microsoft/TypeScript/issues/62395
 export default class Points extends WithExtraProps(Dataset, {
@@ -16,8 +15,7 @@ export default class Points extends WithExtraProps(Dataset, {
             type      : "scatter" as const,
         }) {
 
-    // one line due to ConstructorParem use...
-    constructor(...args: Args) {
+    constructor(...args: ComponentArgs<Points, [ArgsData]>) {
         super( datasetArgsParser(...args) );
     }
 
@@ -38,13 +36,8 @@ export default class Points extends WithExtraProps(Dataset, {
 
 // =================== PLUGIN =========================
 
-import ChartJS from "../../Chart";
-
 declare module "../../Chart" {
-    interface ChartJS {
-        addPoints   (...args: Args): ChartJS;
-        createPoints(...args: Args): Points;
-    }
+    interface ChartJS extends WithDataset<typeof Points, "Points"> {}
 }
 
 registerDatasetType(Points, "Points");

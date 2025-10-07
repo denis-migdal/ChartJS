@@ -1,14 +1,12 @@
 import { BarController, ChartDataset } from "chart.js";
 import { ComponentArgs, WithExtraProps } from "..";
-import Dataset, { datasetArgsParser, registerDatasetType } from ".";
+import Dataset, { datasetArgsParser, registerDatasetType, WithDataset } from ".";
 
 import {Chart, ScatterController, BarElement} from 'chart.js';
 // Can't register plugins after graph creation...
 Chart.register(ScatterController, BarElement, BarController);
 
-
 type ArgsData = [number, number][];
-type Args     = ComponentArgs<Bars, [ArgsData]>;
 
 //TODO: reversed: boolean
 
@@ -18,8 +16,7 @@ export default class Bars extends WithExtraProps(Dataset, {
             type      : "bar" as const,
         }) {
 
-    // one line due to ConstructorParem use...
-    constructor(...args: Args) {
+    constructor(...args: ComponentArgs<Bars, [ArgsData]>) {
         super( datasetArgsParser(...args) );
     }
 
@@ -47,13 +44,8 @@ export default class Bars extends WithExtraProps(Dataset, {
 
 // =================== PLUGIN =========================
 
-import ChartJS from "../../Chart";
-
 declare module "../../Chart" {
-    interface ChartJS {
-        addBars   (...args: Args): ChartJS;
-        createBars(...args: Args): Bars;
-    }
+    interface ChartJS extends WithDataset<typeof Bars, "Bars"> {}
 }
 
 registerDatasetType(Bars, "Bars");

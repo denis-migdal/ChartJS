@@ -1,9 +1,8 @@
 import { ComponentArgs, WithExtraProps } from "..";
 import Line from "./Line";
-import { datasetArgsParser, registerDatasetType } from ".";
+import { datasetArgsParser, registerDatasetType, WithDataset } from ".";
 
 type ArgsData = number|null;
-type Args     = ComponentArgs<HLine, [ArgsData]>;
 
 // https://github.com/microsoft/TypeScript/issues/62395
 export default class HLine extends WithExtraProps(Line, {
@@ -11,9 +10,8 @@ export default class HLine extends WithExtraProps(Line, {
             showPoints: false as const,
         }) {
 
-    // one line due to ConstructorParem use...
-    constructor(...args: Args) {
-        super( datasetArgsParser(...args) ); // TODO: somehow give condition...
+    constructor(...args: ComponentArgs<HLine, [ArgsData]>) {
+        super( datasetArgsParser(...args) );
     }
 
     // fix instance properties type.
@@ -33,13 +31,8 @@ export default class HLine extends WithExtraProps(Line, {
 
 // =================== PLUGIN =========================
 
-import ChartJS from "../../Chart";
-
 declare module "../../Chart" {
-    interface ChartJS {
-        addHLine   (...args: Args): ChartJS;
-        createHLine(...args: Args): HLine;
-    }
+    interface ChartJS extends WithDataset<typeof HLine, "HLine"> {}
 }
 
 registerDatasetType(HLine, "HLine");
