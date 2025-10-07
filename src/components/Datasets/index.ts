@@ -15,13 +15,15 @@ export const datasetArgsParser = buildArgsParser( (opts: Record<string,any>,
 export default class Dataset extends WithExtraProps(Component, {
             color: "black",
             data : [] as [number, number][],
-            type : "scatter"
+            type : "scatter",
+            x    : "x",
+            y    : "y"
         }) {
 
     protected static createDataset<T extends keyof ChartTypeRegistry>(type: T = "scatter" as T): ChartDataset<T> {
         return {
             type,
-            data: []
+            data: [],
         } as unknown as ChartDataset<T>;
     }
 
@@ -58,6 +60,12 @@ export default class Dataset extends WithExtraProps(Component, {
     protected override onUpdate(chart: Chart) {
         //TODO: check if pending...
         super.onUpdate(chart);
+
+        // @ts-ignore
+        this.dataset.xAxisID = this.properties.getValue("x");
+        // @ts-ignore
+        this.dataset.yAxisID = this.properties.getValue("y");
+
         this.dataset.data = this.getParsedData();
         this.dataset.borderColor = this.dataset.backgroundColor = this.properties.getValue("color");
     }

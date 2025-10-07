@@ -50,10 +50,11 @@ function buildLabelScale(pos: "top"|"bottom"|"left"|"right") {
 // https://github.com/microsoft/TypeScript/issues/62395
 export default class Scale extends WithExtraProps(Component, {
             name  : "string",
-            pos   : null as null|"left"|"right"|"top"|"bottom",
+            pos   : "auto" as "auto"|"left"|"right"|"top"|"bottom",
             min   : null as null|number,
             max   : null as null|number,
-            labels: null as null|string[]
+            labels: null as null|string[],
+            display: true as boolean
         }) {
 
     constructor(...args: [string]|[string, ScaleOpts]|[ScaleOpts & {name: string}]) {
@@ -65,9 +66,9 @@ export default class Scale extends WithExtraProps(Component, {
         super.onUpdate(chart);
 
         const name = this.properties.getValue("name");
-        let pos    = this.properties.getValue("pos");
+        let   pos  = this.properties.getValue("pos");
 
-        if( pos === null ) {
+        if( pos === "auto" ) {
             if(name[0] === 'y')
                 pos = 'left';
             else
@@ -94,19 +95,10 @@ export default class Scale extends WithExtraProps(Component, {
             scale.labels = labels;
         }
 
+        scale.display  = this.properties.getValue("display");
         scale.position = pos;
-
         (chart as InternalChart)._chart.options.scales![name] = scale;
     }
-
-/*
-    protected override onUpdate() {
-        //TODO: check if pending...
-        super.onUpdate();
-        this.dataset.data = this.getParsedData();
-        this.dataset.borderColor = this.properties.getValue("color");
-    }
-        */
 }
 
 import ChartJS from "../Chart";

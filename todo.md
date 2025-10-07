@@ -1,7 +1,9 @@
 - 3/7 curves to add (?)
 - 2 components to add (datalabel, tooltip)
 
-- use scale (x,y) + hide scale... (position: x-hidden / y-hidden).
+- datasets: use scale "x", "y", "x2", etc.
+- hide scale... (position: x-hidden / y-hidden).
+- zoom limits
 
 ## ChartHTML
 

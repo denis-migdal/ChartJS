@@ -64,12 +64,17 @@ dataSignal.value = 0;
 setInterval( () => ++dataSignal.value, 1000);
 ```
 
-### Zoom
+### Plugins
+
+#### Zoom
 
 Enables to configure the zoom/pan of the graph:
 - `graph.setZoom(dir)` : dir is either `"x"`, `"y"`, `"xy"`, `false`.
 - `graph.resetZoom()`
 
+#### Datalabels
+
+#### Tooltips
 
 ### Dataset
 
@@ -80,7 +85,8 @@ Represents data shown in your graph (e.g. line, histogram, etc).
 | `color` | `string` | `"black"` |
 | `type` | `string` | `"scatter"` |
 | `data` | `[number,number][]` | `[]` |
-
+| `x` | `string` | `"x"` |
+| `y` | `string` | `"y"` |
 
 #### Points
 
@@ -122,7 +128,8 @@ Represents a scale. If labels are given, behave as a category scale.
 | Property | Type | Default |
 |----------|------|---------|
 | `name` | `string` | required |
-| `pos` | `null\|"left"\|"right"\|"top"\|"bottom"` | `null` |
+| `pos` | `"auto""\|"left"\|"right"\|"top"\|"bottom"` | `"auto"` |
+| `display` | `boolean` | `true` |
 | `min` | `null\|number` | `null` |
 | `max` | `null\|number` | `null` |
 | `labels` | `null\|string[]` | `null` |
