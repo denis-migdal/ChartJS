@@ -1,6 +1,6 @@
 import { ChartDataset } from "chart.js";
 import { ComponentArgs, WithExtraProps } from "..";
-import Dataset, { datasetArgsParser } from ".";
+import Dataset, { datasetArgsParser, registerDatasetType } from ".";
 
 import {Chart, ScatterController, LineElement, PointElement} from 'chart.js';
 // Can't register plugins after graph creation...
@@ -56,12 +56,4 @@ declare module "../../Chart" {
     }
 }
 
-ChartJS.prototype.addLine = function(...args: Args) {
-    this.createLine(...args);
-    return this;
-}
-ChartJS.prototype.createLine = function(...args: Args) {
-    const line = new Line(...args);
-    this.append(line);
-    return line;
-}
+registerDatasetType(Line, "Line");

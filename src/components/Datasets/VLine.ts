@@ -1,6 +1,6 @@
 import { ComponentArgs, WithExtraProps } from "..";
 import Line from "./Line";
-import { datasetArgsParser } from ".";
+import { datasetArgsParser, registerDatasetType } from ".";
 
 type ArgsData = number|null;
 type Args     = ComponentArgs<VLine, [ArgsData]>;
@@ -42,12 +42,4 @@ declare module "../../Chart" {
     }
 }
 
-ChartJS.prototype.addVLine = function(...args: Args) {
-    this.createVLine(...args);
-    return this;
-}
-ChartJS.prototype.createVLine = function(...args: Args) {
-    const line = new VLine(...args);
-    this.append(line);
-    return line;
-}
+registerDatasetType(VLine, "VLine");

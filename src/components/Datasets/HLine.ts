@@ -1,6 +1,6 @@
 import { ComponentArgs, WithExtraProps } from "..";
 import Line from "./Line";
-import { datasetArgsParser } from ".";
+import { datasetArgsParser, registerDatasetType } from ".";
 
 type ArgsData = number|null;
 type Args     = ComponentArgs<HLine, [ArgsData]>;
@@ -42,12 +42,4 @@ declare module "../../Chart" {
     }
 }
 
-ChartJS.prototype.addHLine = function(...args: Args) {
-    this.createHLine(...args);
-    return this;
-}
-ChartJS.prototype.createHLine = function(...args: Args) {
-    const line = new HLine(...args);
-    this.append(line);
-    return line;
-}
+registerDatasetType(HLine, "HLine");

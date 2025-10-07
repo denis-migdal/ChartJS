@@ -1,6 +1,6 @@
 import { ChartDataset, ChartTypeRegistry } from "chart.js";
 import Component, { buildArgsParser, WithExtraProps } from "..";
-import type Chart from "../../Chart";
+import Chart from "../../Chart";
 import { InternalChart } from "../../Chart";
 
 
@@ -68,5 +68,27 @@ export default class Dataset extends WithExtraProps(Component, {
 
         this.dataset.data = this.getParsedData();
         this.dataset.borderColor = this.dataset.backgroundColor = this.properties.getValue("color");
+    }
+}
+
+// @todo: remove @ts-ignore, better type check (?)
+export function registerDatasetType<T extends {new(...args: any[]): Component}>(Klass: T, name: string) {
+
+    const    addMeth =    `add${name}`;
+    const createMeth = `create${name}`;
+
+    // @ts-ignore
+    Chart.prototype[createMeth] = function(...args: any[]) {
+        const dataset = new Klass(...args);
+        // @ts-ignore
+        this.append(dataset);
+        return dataset;
+    }
+
+    // @ts-ignore
+    Chart.prototype[addMeth] = function(...args: any[]) {
+        // @ts-ignore
+        this[createMeth](...args);
+        return this;
     }
 }
