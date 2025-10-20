@@ -61,10 +61,20 @@ import { WithComponent } from './impl/registerComponent';
 declare module "../Chart" {
     interface ChartJS extends WithComponent<typeof Zoom> {
         resetZoom(): ChartJS
+        setZoom(dir: ZoomDirection): ChartJS
     }
 }
 
 ChartJS.prototype.resetZoom = function() {
     this._chart.resetZoom();
+    return this;
+}
+
+ChartJS.prototype.setZoom = function(direction: ZoomDirection) {
+    const zoom = this.getComponent<InstanceType<typeof Zoom>>("zoom");
+    if( zoom === null)
+        return this.addZoom({direction});
+
+    zoom.properties.direction = direction;
     return this;
 }
