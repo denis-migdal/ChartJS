@@ -1,73 +1,43 @@
-import Component, { buildArgsParser, ComponentArgs, WithExtraProps } from ".";
-import { InternalChart } from "../Chart";
-
-import {CategoryScale, Chart, LinearScale} from 'chart.js';
-
-// Can't register plugins after graph creation...
+import {CategoryScale, Chart, LinearScale, ScaleOptions} from 'chart.js';
+import createComponentClass from './impl/createComponentClass';
+import { WithComponent } from './impl/registerComponent';
 Chart.register(LinearScale, CategoryScale);
 
-// name option is required.
-type ScaleOpts = Partial<(typeof Scale)["Defaults"]>;
-type Args = [string]|[string, ScaleOpts]|[ScaleOpts & {name: string}];
+type CatScale = ScaleOptions<'category'>;
+type LinScale = ScaleOptions<'linear'>;
 
-const parser = buildArgsParser();
-
-function buildLinearScale() {
-    return {
-        type        : 'linear',
-        beginAtZero : true,
-        offset      : false,
-        grid        : {
-            offset: false,
+const Scale = createComponentClass({
+    name      : "Scale",
+    properties: {
+        name   : "string",
+        pos    : "auto" as "auto"|"left"|"right"|"top"|"bottom",
+        min    : null as null|number,
+        max    : null as null|number,
+        labels : null as null|string[],
+        display: true as boolean
+    },
+    createInternalData() {
+        return {
+            // chartJS internal state
+            scale  : {} as LinScale|CatScale,
+            // impl internal state
+            name   : ""
         }
-    } as any; // Fuck this.;
-}
+    },
+    onInsert(chart, internals) {
+        if( internals.name !== "")
+            chart.options.scales![internals.name] = internals.scale;
+    },
+    onRemove(chart, internals) {
+        const scales = chart.options.scales!;
+        if( scales[internals.name] === internals.scale)
+            delete scales[internals.name];
+    },
+    onUpdate(data, internals, refs) {
 
-function buildLabelScale(pos: "top"|"bottom"|"left"|"right") {
-    
-    const scale: any = {
-        type   : "category",
-        offset : true,
-        grid: {
-            offset: true
-        },
-    }
+        const name = data.name;
 
-    if(pos === "left" || pos === "right") {
-        scale.reverse = true;
-        scale.ticks = {
-            padding: 0,
-            align: 'start',
-            crossAlign: 'center',
-            maxRotation: 90,
-            minRotation: 90
-        };
-    }
-
-    return scale;
-}
-
-// https://github.com/microsoft/TypeScript/issues/62395
-export default class Scale extends WithExtraProps(Component, {
-            name  : "string",
-            pos   : "auto" as "auto"|"left"|"right"|"top"|"bottom",
-            min   : null as null|number,
-            max   : null as null|number,
-            labels: null as null|string[],
-            display: true as boolean
-        }) {
-
-    constructor(...args: [string]|[string, ScaleOpts]|[ScaleOpts & {name: string}]) {
-        super( parser(...args) );
-    }
-
-    protected override onUpdate(chart: ChartJS): void {
-
-        super.onUpdate(chart);
-
-        const name = this.properties.getValue("name");
-        let   pos  = this.properties.getValue("pos");
-
+        let pos = data.pos;
         if( pos === "auto" ) {
             if(name[0] === 'y')
                 pos = 'left';
@@ -75,48 +45,96 @@ export default class Scale extends WithExtraProps(Component, {
                 pos = 'bottom';
         }
 
-        const labels = this.properties.getValue("labels");
+        const scale = internals.scale;
+        const type  = scale.type;
+        clearScale(scale);
 
-        let scale: any;
+        const labels = data.labels;
         if( labels === null ) {
-            scale = buildLinearScale();
 
-            const min    = this.properties.getValue("min");
-            const max    = this.properties.getValue("max");
+            if( type !== "linear")
+                setScaleAsLinear(scale as LinScale);
 
-            if( min !== null)
-                scale.min = min;
-            if( max !== null)
-                scale.max = max;
+            const min = data.min; const max = data.max;
+
+            if( min !== null) scale.min = min;
+            if( max !== null) scale.max = max;
         } else {
 
-            scale = buildLabelScale(pos);
+            if( type !== "category")
+                setScaleAsCategory(scale as CatScale);
 
-            scale.labels = labels;
+            (scale as CatScale).labels = labels;
+
+            if(pos === "left" || pos === "right") {
+                scale.reverse = true;
+                scale.ticks   = CatTicks;
+            }
         }
 
-        scale.display  = this.properties.getValue("display");
+        scale.display  = data.display;
         scale.position = pos;
-        (chart as InternalChart)._chart.options.scales![name] = scale;
-    }
-}
 
-import ChartJS from "../Chart";
+        internals.scale = scale;
+
+        const renamed = internals.name !== name;
+        if( ! renamed ) return;
+
+        // please avoid renaming scales.
+        for(let i = 0; i < refs.length; ++i) {
+            const chart = refs[i].chart;
+            if( chart === null)
+                continue;
+
+            const scales = chart.options.scales!;
+
+            if( scales[internals.name] === internals.scale )
+                delete scales[internals.name];
+
+            scales[name] = internals.scale;
+        }
+
+        internals.name = name;
+    },
+});
 
 declare module "../Chart" {
-    interface ChartJS {
-        addScale   (...args: Args): ChartJS;
-        createScale(...args: Args): Scale;
-    }
+    interface ChartJS extends WithComponent<typeof Scale> {}
 }
 
-// we keep type checks
-ChartJS.prototype.addScale = function(...args: Args) {
-    this.createScale(...args);
-    return this;
+export default Scale;
+
+// avoid building useless objects (small opti).
+const LinGrid = { offset: false }
+const CatGrid = { offset: true  }
+const CatTicks = {
+    padding: 0,
+    align: 'start',
+    crossAlign: 'center',
+    maxRotation: 90,
+    minRotation: 90
+} as const
+
+function clearScale(scale: LinScale|CatScale) {
+    delete scale.reverse;
+    delete scale.ticks;
+    delete scale.min;
+    delete scale.max;
 }
-ChartJS.prototype.createScale = function(...args: Args) {
-    const scale = new Scale(...args);
-    this.append(scale);
-    return scale;
+
+function setScaleAsLinear(scale: LinScale) {
+
+    scale.type   = 'linear';
+    scale.offset = false;
+    scale.grid   = LinGrid;
+    scale.beginAtZero = true;
 }
+
+function setScaleAsCategory(scale: CatScale) {
+    
+    scale.type   = "category";
+    scale.offset = true;
+    scale.grid   = CatGrid;
+}
+
+

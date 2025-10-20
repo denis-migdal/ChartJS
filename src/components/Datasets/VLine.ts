@@ -1,38 +1,33 @@
-import { ComponentArgs, WithExtraProps } from "..";
+import { updateDataset } from ".";
+import override from "../impl/override";
+import { WithComponent } from "../impl/registerComponent";
 import Line from "./Line";
-import { datasetArgsParser, registerDatasetType, WithDataset } from ".";
 
-type ArgsData = number|null;
-
-// https://github.com/microsoft/TypeScript/issues/62395
-export default class VLine extends WithExtraProps(Line, {
-            data: null as ArgsData,
-            showPoints: false as const,
-        }) {
-
-    constructor(...args: ComponentArgs<VLine, [ArgsData]>) {
-        super( datasetArgsParser(...args) );
+const VLine = override(Line, {
+    name      : "VLine",
+    properties: {
+        data      : null  as number|null,
+        showPoints: false as const,
+    },
+    cstrArgsParser(opts, value: number) {
+        opts.data = value
+    },
+    onUpdate(data, internals) {
+        updateDataset(data, internals, VLineParser);
     }
+});
 
-    // fix instance properties type.
-    // @ts-ignore
-    override defaults!: typeof VLine.Defaults;
+function VLineParser(value: number|null) {
 
-    protected override getParsedData() {
-        const value = this.properties.getValue("data");
-        if( value === null)
-            return [];
+    if( value === null)
+        return [];
 
-        //TODO...
-        return super.getParsedData([ [value, Number.NEGATIVE_INFINITY],
-                                     [value, Number.POSITIVE_INFINITY] ]);
-    }
+    return [{x: value, y: Number.NEGATIVE_INFINITY},
+            {x: value, y: Number.POSITIVE_INFINITY}];
 }
-
-// =================== PLUGIN =========================
 
 declare module "../../Chart" {
-    interface ChartJS extends WithDataset<typeof VLine, "VLine"> {}
+    interface ChartJS extends WithComponent<typeof VLine> {}
 }
 
-registerDatasetType(VLine, "VLine");
+export default VLine;

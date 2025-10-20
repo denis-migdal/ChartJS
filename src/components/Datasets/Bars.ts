@@ -1,51 +1,35 @@
-import { BarController, ChartDataset } from "chart.js";
-import { ComponentArgs, WithExtraProps } from "..";
-import Dataset, { datasetArgsParser, registerDatasetType, WithDataset } from ".";
+import { WithComponent } from "../impl/registerComponent";
+import derive from "../impl/derive";
+import Dataset from ".";
 
-import {Chart, ScatterController, BarElement} from 'chart.js';
-// Can't register plugins after graph creation...
-Chart.register(ScatterController, BarElement, BarController);
+import {Chart, BarController, BarElement, ChartDataset} from 'chart.js';
+Chart.register(BarElement, BarController);
 
-type ArgsData = [number, number][];
-
-//TODO: reversed: boolean
-
-// https://github.com/microsoft/TypeScript/issues/62395
-export default class Bars extends WithExtraProps(Dataset, {
-            data      : [] as ArgsData, // vs RawData...
-            type      : "bar" as const,
-        }) {
-
-    constructor(...args: ComponentArgs<Bars, [ArgsData]>) {
-        super( datasetArgsParser(...args) );
+const Points = derive(Dataset, {
+    name      : "Bars",
+    properties: {
+        type: "bar" as const,
+    },
+    createInternalData() {
+        return {
+            prevData: null as any,
+            dataset  : {
+                type              : "bar",
+                borderWidth       : 0,
+                barPercentage     : 1,
+                categoryPercentage: 1,
+                // for linear scale ?
+                grouped   : false,
+                // dataset.barThickness = "flex"; // not working properly ?
+                parsing   : false,
+                normalized: true
+            } as ChartDataset<"bar">,
+        }
     }
-
-    static createDataset() {
-        const dataset = Dataset.createDataset("bar");
-
-        dataset.borderWidth   = 0;
-        dataset.barPercentage = 1;
-        dataset.categoryPercentage = 1;
-        // for linear scale ?
-        dataset.grouped = false;
-
-        // dataset.barThickness = "flex"; // not working properly ?
-
-        dataset.parsing     = false;
-        dataset.normalized  = true;
-
-        return dataset;
-    }
-
-    override get dataset(): ChartDataset<"bar"> {
-        return super.dataset as any;
-    }
-}
-
-// =================== PLUGIN =========================
+});
 
 declare module "../../Chart" {
-    interface ChartJS extends WithDataset<typeof Bars, "Bars"> {}
+    interface ChartJS extends WithComponent<typeof Points> {}
 }
 
-registerDatasetType(Bars, "Bars");
+export default Points;

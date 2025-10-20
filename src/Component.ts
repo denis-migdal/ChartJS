@@ -2,7 +2,7 @@ import Chart from "./Chart";
 
 export type ComponentParent = {
     /*
-        compo.remove() => parent.removeChild(compo) => compo._remove(...)
+        c.remove() => p.removeChild(c) => c._remove(...)
         we need this indirection as a component can be registered into several graphs.
     */
     removeChild<T extends Component>(child: T): T;
@@ -11,10 +11,17 @@ export type ComponentParent = {
 
 // abstract class required as we have protected members.
 export default abstract class Component {
-    abstract clone(): this;
-    abstract remove(): void;
-    readonly abstract parent: ComponentParent|null;
+    
+    // minimal public interface:
+
     readonly abstract name  : string|null;
+    readonly abstract parent: ComponentParent|null;
+
+    abstract clone   (): this;
+    abstract cloneRef(): this;
+    abstract remove()  : void;
+
+    // protected interface:
 
     protected readonly abstract updateRequested: boolean;
 

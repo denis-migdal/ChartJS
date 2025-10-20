@@ -1,41 +1,48 @@
-import { InternalComponent } from "./Component";
-import type Component from "./components";
-
 type PropertiesDescriptor = Record<string, any>;
 
 type Props< K extends {new(...args: any[]): any},
             P extends PropertiesDescriptor> = Omit<K, "constructor">
         & {new(...args: ConstructorParameters<K>): InstanceType<K> & P};
 
-export type Properties<T extends PropertiesDescriptor> = InstanceType<ReturnType<typeof buildProperties<T>>>;
 
-export function buildProperties<T extends PropertiesDescriptor>(defaults: T) {
+export type PropertiesKlass<T extends PropertiesDescriptor>
+                        = ReturnType<typeof buildPropertiesKlass<T>>;
+
+export type Properties<T extends PropertiesDescriptor>
+                        = InstanceType<PropertiesKlass<T>>;
+
+type Target = {
+    requestUpdate(): void
+}
+
+export function buildPropertiesKlass<T extends PropertiesDescriptor>(defaults: T) {
 
     class Properties {
 
-        #parent!: Component;
+        #target!: Target;
 
         // be careful:
         // https://github.com/microsoft/TypeScript/issues/62394
-        constructor(parent: Component) {
-            this.#parent = parent;
+        constructor(target: Target) {
+            this.#target = target;
         }
 
-        #values: Partial<T> = {};
+        readonly values: T = {...defaults};
 
         onValueChange() {
-            (this.#parent as any).requestUpdate();
+            this.#target.requestUpdate();
         }
 
-        clearValue<K extends keyof T>(propname: K) {
-            delete this.#values[propname];
+        resetValue<K extends keyof T>(propname: K) {
+            this.values[propname] = defaults[propname];
             this.onValueChange();
             return this;
         }
 
-        setValues<P extends Partial<T>>(vals: P) {
+        setValues(vals: Partial<T>) {
+
             for(let propname in vals)
-                this.#values[propname] = vals[propname];
+                this.values[propname] = vals[propname]!;
             
             this.onValueChange();
 
@@ -44,7 +51,7 @@ export function buildProperties<T extends PropertiesDescriptor>(defaults: T) {
 
         setValue<K extends keyof T>(propname: K, propval: T[K]) {
             
-            this.#values[propname] = propval;
+            this.values[propname] = propval;
             
             this.onValueChange();
 
@@ -52,7 +59,7 @@ export function buildProperties<T extends PropertiesDescriptor>(defaults: T) {
         }
 
         getValue<K extends keyof T>(propname: K): T[K] {
-            return this.#values[propname] ?? defaults[propname];
+            return this.values[propname];
         }
     }
 

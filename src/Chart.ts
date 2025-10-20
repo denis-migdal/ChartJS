@@ -61,7 +61,7 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false})
     append(component: Component) {
         const compo     = component as InternalComponent;
         if( compo.parent !== null)
-            compo.remove();
+            compo.parent.removeChild(compo);
 
         compo[IS_INSERT_PENDING] = true;
         compo.parent = this;
@@ -70,7 +70,7 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false})
     }
 
     import<T extends Component>( component: T ): T {
-        const clone = component.clone();
+        const clone = component.cloneRef();
         this.append(clone);
         return clone;
     }

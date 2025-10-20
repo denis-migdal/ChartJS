@@ -1,109 +1,78 @@
-import { ChartDataset, ChartTypeRegistry } from "chart.js";
-import Component, { buildArgsParser, WithExtraProps } from "..";
-import Chart from "../../Chart";
-import { InternalChart } from "../../Chart";
+import { ChartDataset } from "chart.js";
+import createComponentClass from "../impl/createComponentClass";
 
-
-export const datasetArgsParser = buildArgsParser( (opts: Record<string,any>,
-                                                   data?: unknown,
-                                                   ..._) => {
-    opts.data = data;
+const Dataset = createComponentClass({
+    name          : "Dataset",
+    properties: {
+        name : null as string|null,
+        type : "scatter",
+        color: "black",
+        data : [] as [number, number][],
+        x    : "x",
+        y    : "y"
+    },
+    cstrArgsParser: (opts, data: [number, number][]) => {
+        opts.data = data;
+    },
+    createInternalData() {
+        return {
+            prevData: null as any,
+            dataset : {} as ChartDataset<any>,
+        }
+    },
+    onInsert(chart, internals) {
+        chart.data.datasets.push(internals.dataset);
+    },
+    onRemove(chart, internals) {
+        const datasets = chart.data.datasets;
+        const idx = datasets.indexOf(internals.dataset);
+        if( idx === -1)
+            throw new Error("Dataset not found");
+        datasets.splice(idx, 1);
+    },
+    onUpdate(data, internals) {
+        internals.dataset.type = data.type;
+        updateDataset(data, internals, rawParser);
+    },
 });
 
+type Data<D extends any> = {
+    color: string,
+    x    : string,
+    y    : string,
+    data : D
+}
 
-// https://github.com/microsoft/TypeScript/issues/62395
-export default class Dataset extends WithExtraProps(Component, {
-            color: "black",
-            data : [] as [number, number][],
-            type : "scatter",
-            x    : "x",
-            y    : "y"
-        }) {
+type Internal<D extends any> = {
+    dataset : ChartDataset<any>,
+    prevData: D
+}
 
-    protected static createDataset<T extends keyof ChartTypeRegistry>(type: T = "scatter" as T): ChartDataset<T> {
-        return {
-            type,
-            data: [],
-        } as unknown as ChartDataset<T>;
-    }
+type DataParser<D extends any> = (raw: D) => {x: number, y: number}[];
 
-    readonly #dataset: ChartDataset = (this.constructor as typeof Dataset)
-                                                            .createDataset();
+export function rawParser(data: ReadonlyArray<readonly [number,number]>) {
+    let parsedData = new Array(data.length);
+    for(let i = 0; i < data.length; ++i)
+        parsedData[i] = {x: data[i][0], y: data[i][1]};
 
-    get dataset() {
-        return this.#dataset;
-    }
+    return parsedData;
+}
 
-    // TODO: cache...
-    protected getParsedData( data: [number, number][] = this.properties.getValue("data") ) {
-        let parsedData = new Array(data.length);
-        for(let i = 0; i < parsedData.length; ++i) {
-            parsedData[i] = {x: data[i][0], y: data[i][1]};
-        }
-        return parsedData;
-    }
+export function updateDataset<D extends any>(data      : Data<D>,
+                                             internals : Internal<D>,
+                                             dataParser: DataParser<D>) {
 
-    protected override onInsert(chart: Chart) {
-        super.onInsert(chart);
-        (chart as InternalChart)._chart.data.datasets.push(this.dataset);
-    }
+    const dataset = internals.dataset;
+    dataset.xAxisID = data.x;
+    dataset.yAxisID = data.y;
 
-    protected override onRemove(chart: Chart) {
-        super.onRemove(chart);
-        const datasets = (chart as InternalChart)._chart.data.datasets;
-        const idx = datasets.indexOf(this.dataset as any);
-        if( idx === -1)
-            throw new Error("Child not found");
-        datasets.splice(idx, 1);
-    }
+    dataset.borderColor = dataset.backgroundColor = data.color;
 
-    protected override onUpdate(chart: Chart) {
-        //TODO: check if pending...
-        super.onUpdate(chart);
-
-        // @ts-ignore
-        this.dataset.xAxisID = this.properties.getValue("x");
-        // @ts-ignore
-        this.dataset.yAxisID = this.properties.getValue("y");
-
-        this.dataset.data = this.getParsedData();
-        this.dataset.borderColor = this.dataset.backgroundColor = this.properties.getValue("color");
+    // recomputing data might be costly...
+    if( internals.prevData !== data.data) {
+        internals.prevData = data.data;
+        dataset.data = dataParser(data.data);
     }
 }
 
-// ======== PLUGIN ===========
-
-import {Cstr} from "@misc/types/Cstr";
-
-type Add<T extends string> = `add${T}`;
-type Create<T extends string> = `create${T}`;
-type Filter<T> = (T extends Add<infer U> ? U : never) & (T extends Create<infer U> ? U : never);
-
-type ComponentNames = Filter<keyof Chart>;
-
-type ComponentName<T extends Cstr> = Exclude<keyof {
-    [K in ComponentNames as ReturnType<Chart[`create${K}`]> extends InstanceType<T> ? K : never]: true
-}, symbol|number>;
-
-export type WithDataset<T extends Cstr<Component>, N extends string> = Record<`create${N}`, (...args: ConstructorParameters<T>) => InstanceType<T>> & Record<`add${N}`, (...args: ConstructorParameters<T>) => Chart>;
-
-// @todo : verif add/create parameters with Cstr parameters (?).
-export function registerDatasetType<T extends Cstr<Component>>(Klass: T, name: ComponentName<T>) {
-
-    const    addMeth =    `add${name}` as const;
-    const createMeth = `create${name}` as const;
-
-    // @ts-ignore
-    Chart.prototype[createMeth] = function(...args: any[]) {
-        const dataset = new Klass(...args);
-        this.append(dataset);
-        return dataset;
-    }
-
-    // @ts-ignore
-    Chart.prototype[addMeth] = function(...args: any[]) {
-        // @ts-ignore
-        this[createMeth](...args);
-        return this;
-    }
-}
+export default Dataset;

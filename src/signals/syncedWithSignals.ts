@@ -93,6 +93,9 @@ class SyncedWithSignalHost<T extends BaseComponent, S extends Signal<any>[]> ext
         // @ts-ignore
         return new SyncedWithSignalHost(this.#ref);
     }
+    override cloneRef(): this {
+        return this.clone();
+    }
 
     #parent: ComponentParent|null = null;
     get parent(): ComponentParent|null { return this.#parent; }

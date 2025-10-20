@@ -1,6 +1,4 @@
 import ChartJS   from "../../";
-import Scale from "../../components/scale";
-
 const chart = new ChartJS(); // or new ChartJS(canvas);
 
 //TODO...

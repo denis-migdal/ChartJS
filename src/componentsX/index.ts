@@ -1,4 +1,4 @@
-import { buildProperties, Properties } from "../Properties";
+import { buildPropertiesKlass, Properties } from "../Properties";
 import type Chart from "../Chart";
 import { Cstr } from "@misc/types/Cstr";
 import Component, { ComponentParent } from "../Component";
@@ -52,7 +52,7 @@ export default class BaseComponent extends Component {
     static Defaults = {
         name: null as string|null
     };
-    static readonly Properties = buildProperties(BaseComponent.Defaults);
+    static readonly Properties = buildPropertiesKlass(BaseComponent.Defaults);
 
     readonly defaults!: typeof BaseComponent.Defaults; // for typing purposes.
     readonly properties = new (this.constructor as typeof BaseComponent).Properties(this) as Properties<this["defaults"]>;
@@ -67,8 +67,8 @@ export default class BaseComponent extends Component {
     setProperties<T extends Partial<this["defaults"]>>(properties: T) {
         this.properties.setValues(properties);
     }
-    clearProperty<T extends keyof this["defaults"]>(propname: T) {
-        this.properties.clearValue(propname);
+    resetProperty<T extends keyof this["defaults"]>(propname: T) {
+        this.properties.resetValue(propname);
     }
 
     constructor(opts: Record<string, any> = {}) {
@@ -83,6 +83,10 @@ export default class BaseComponent extends Component {
     clone(): this {
         // @ts-ignore
         return new this.constructor(this.properties);
+    }
+
+    cloneRef() {
+        return this.clone();
     }
 
     get name() {
@@ -102,7 +106,7 @@ export default class BaseComponent extends Component {
         return this.#updateRequested;
     }
 
-    protected requestUpdate() {
+    requestUpdate() {
         //if( this.#updateRequested === true )
         //    return;
         this.#updateRequested = true;
@@ -161,7 +165,7 @@ function ExtendsMixins<
     return class extends Base {
 
         static Defaults            = {} as MergeProps<BP, P>;
-        static readonly Properties = {} as ReturnType<typeof buildProperties<MergeProps<BP, P>>>;
+        static readonly Properties = {} as ReturnType<typeof buildPropertiesKlass<MergeProps<BP, P>>>;
 
         // for type purposes
         defaults!: MergeProps<BP, P>;
@@ -185,6 +189,6 @@ export function WithExtraProps<
 
     return class extends Base {
         static override Defaults  = Defaults;
-        static Properties = buildProperties(Defaults);
+        static Properties = buildPropertiesKlass(Defaults);
     };
 }

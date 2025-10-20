@@ -12,7 +12,7 @@ export {default as Bars} from "./components/Datasets/Bars";
 
 // can be removed.
 export {default as TrivialSignal} from "./signals/TrivialSignal";
-export {default as syncedWithSignals} from "./signals/syncedWithSignals";
-
+export {default as updateFromSignals} from "./signals/updateFromSignals";
+//export {default as syncedWithSignals} from "./signals/syncedWithSignals";
 
 export default Chart;
