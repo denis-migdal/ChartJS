@@ -21,7 +21,7 @@ Graphs are aggregations of components (datasets, scales, etc) you can add or rem
 - `chart.addX(...)`: add a component `X` to the graph.
 - `chart.createX(...)`: idem `addX` but returns the created component.
 - `chart.append(c)`: add the component `c` to the graph (will be removed from its previous parent).
-- `chart.import(c)`: add a clone of the component `c` to the graph.
+- `chart.import(c)`: add the component `c` to the graph (in reality a cloned reference).
 - `chart.getComponent(name)`: returns the component named `name`.
 - `chart.getComponentNames()`: returns the names of the graph's components.
 
@@ -30,35 +30,36 @@ Components are usually created with the following arguments: `([name,][data,...]
 - `c.parent`: the component parent (usually the graph).
 - `c.remove()`: remove the component from its parent.
 - `c.clone()`: clone the component.
+- `c.cloneRef()`: clone the component reference.
 
 Some components has properties you can manipulate:
 - `c.properties`
 - `c.getProperty(name)`
 - `c.setProperty(name, value)`
 - `c.setProperties(props)`
-- `c.clearProperties(name)`
+- `c.resetProperties(name)` : set the property to its default value.
 
 ### Signals
 
 ChartJS++ is compatible with signals (you may need to use an adapter).
 
 ```ts
+// the component to update
+const compo = new HLine();
+
 // a trivial implementation of signals.
 const dataSignal = new TrivialSignal<number>();
 
 const hline = syncedWithSignals(
-  // the target component (will be cloned):
-  new HLine(),
-  // the signal(s) to listen:
-  dataSignal,
-  // the update function:
-  (target, data) => {
-    target.properties.data = data;
+  compo,      // the target component.
+  dataSignal, // the signal(s) to listen.
+  (properties, data) => { // the update function.
+    properties.data = data;
   }
 );
 
-// clone() is optimized to prevent unnecessary copies and updates.
-graph.import(hline);
+// use import if you want to use it inside several graphs.
+graph.append(hline);
 
 dataSignal.value = 0;
 setInterval( () => ++dataSignal.value, 1000);

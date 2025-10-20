@@ -1,15 +1,8 @@
-## Current (component4)
-
 // doc
   // create/derive/override + instance + ref.
   // props update -> instance update -> notify refs -> notify graphs
   // update graph -> update ref -> update instance.
   // updateFromSignal
-
-- use WeakRef array (cf below)
-- use asserts...
-- fix parent (?).
-- move merge into WebMisc...
 
 ## TODO
 
@@ -20,6 +13,13 @@
 
 - get tests from ChartHTML ?
 - Update ChartHTML
+
+## Clean
+
+- fix parent (?).
+- use WeakRef array (cf below)
+- use asserts...
+- move merge into WebMisc...
 
 ```ts
 class WeakRefArray {
