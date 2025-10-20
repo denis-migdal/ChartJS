@@ -8,17 +8,6 @@ import registerDatasetType from "./registerComponent";
 const NULL_INTERNALS = {};
 const NULL_CREATE_INTERNALS = () => { return NULL_INTERNALS; }
 
-/*
-export type CstrArgs<P extends Record<string, any>, C extends any[]> =
-    | [name: string, ...C, opts: Partial<P>]
-    | [name: string, ...C]
-    | [...C, opts: Partial<P>]
-    | [...C]
-    | [name: string, opts: Partial<P>]
-    | [name: string]
-    | [opts: Partial<P>]
-    | [];*/
-
 export type CstrArgs<P extends Record<string, any>, C extends any[]> =
     [
         ...([]|[name: string]),

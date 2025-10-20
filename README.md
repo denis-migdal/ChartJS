@@ -50,7 +50,7 @@ const compo = new HLine();
 // a trivial implementation of signals.
 const dataSignal = new TrivialSignal<number>();
 
-const hline = syncedWithSignals(
+const hline = updateFromSignals(
   compo,      // the target component.
   dataSignal, // the signal(s) to listen.
   (properties, data) => { // the update function.
@@ -134,6 +134,65 @@ Represents a scale. If labels are given, behave as a category scale.
 | `min` | `null\|number` | `null` |
 | `max` | `null\|number` | `null` |
 | `labels` | `null\|string[]` | `null` |
+
+### Create your own components
+
+You can very easily create your own components with :
+- `createComponentClass(descriptor)`.
+- `derive(parent, extra_descriptor)` : create a component from another.
+- `override(parent, extra_descriptor)` : create a component from another with incompatible properties.
+
+⚠ It is not recommended to inherit from a component as it'll very likely won't be respecting Liskov principle.
+
+The component descriptor has the following fields:
+- `name`: the component name (used to add `create${name}()` and `add${name}()` methods to the graphs).
+- `properties: Record<string,any>`: the default value for the component properties (also used to get the properties type).
+- `onInsert: (chart, internals) => void`: add the component to the graph.
+- `onRemove: (chart, internals) => void`: remove the component from the graph.
+- `onUpdate: (properties, internals) => void`: update the component when the properties change.
+- `createInternalData: () => I`: how to create the component internals.
+
+For example:
+```ts
+const MyDataset = createComponentClass({
+    name      : "MyDataset",
+    properties: {
+        data : [] as [number, number][],
+    },
+    createInternalData() {
+        return {
+            dataset : {
+              type: "scatter"
+            } as ChartDataset<"scatter">,
+        }
+    },
+    onInsert(chart, internals) {
+        chart.data.datasets.push(internals.dataset);
+    },
+    onRemove(chart, internals) {
+        const datasets = chart.data.datasets;
+        const idx = datasets.indexOf(internals.dataset);
+        if( idx !== -1) datasets.splice(idx, 1);
+    },
+    onUpdate(properties, internals) {
+        internals.dataset.data = properties.data
+    },
+});
+```
+
+You can then derive it:
+```ts
+const MyColoredDataset = derive(MyDataset, {
+    name      : "MyColoredDataset",
+    properties: {
+      color: "red"
+    },
+    onUpdate(properties, internals) {
+        internals.dataset.color = properties.color;
+        MyDataset.descriptor.onUpdate(properties, internals);
+    },
+});
+```
 
 ### Use the graph
 

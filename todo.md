@@ -1,8 +1,7 @@
 // doc
-  // create/derive/override + instance + ref.
+  // + instance + ref.
   // props update -> instance update -> notify refs -> notify graphs
   // update graph -> update ref -> update instance.
-  // updateFromSignal
 
 ## TODO
 
