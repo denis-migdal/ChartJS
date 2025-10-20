@@ -1,8 +1,3 @@
-// doc
-  // + instance + ref.
-  // props update -> instance update -> notify refs -> notify graphs
-  // update graph -> update ref -> update instance.
-
 ## TODO
 
 - 2 components to add (datalabel, tooltip)

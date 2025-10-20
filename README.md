@@ -135,6 +135,51 @@ Represents a scale. If labels are given, behave as a category scale.
 | `max` | `null\|number` | `null` |
 | `labels` | `null\|string[]` | `null` |
 
+### Use the graph
+
+#### In Browser mode (existing canvas)
+
+```ts
+const canvas = document.querySelector("canvas");
+
+const chart = new Chart(canvas);
+
+// configure graph here.
+```
+
+#### In Browser mode (without existing canvas)
+
+```ts
+const chart = new Chart();
+
+// configure graph here.
+
+// add the graph to the page :
+document.body.append( chart.canvas );
+```
+
+#### In CLI mode
+
+```ts
+// use https://github.com/Automattic/node-canvas/
+// npm install canvas.
+import {Canvas} from "canvas";
+const canvas = new Canvas(W,H);
+
+const chart = new Chart(canvas);
+
+// configure graph here.
+
+// In CLI mode (Deno, Node, Bun), changes made after initialization
+// requires an explicit call to .update().
+chart.update();
+
+// save the graph as a png file.
+await Deno.writeFile("chart.png", await canvas.toBuffer());
+```
+
+## Advanced usage
+
 ### Create your own components
 
 You can very easily create your own components with :
@@ -194,48 +239,21 @@ const MyColoredDataset = derive(MyDataset, {
 });
 ```
 
-### Use the graph
+### Instance, Reference, and clones
 
-#### In Browser mode (existing canvas)
+In reality components are often a reference (`ComponentRef`) pointing to a shared internal data (`ComponentInstance`). Then, `.cloneRef()` clones the component while sharing the same internal data. Whereas `.clone()` also clones the internal data.
 
-```ts
-const canvas = document.querySelector("canvas");
+This means that a component and its `cloneRef()` clone can be viewed as the same component. Any change to one will be applied to the other.
 
-const chart = new Chart(canvas);
+### Update strategy
 
-// configure graph here.
-```
-
-#### In Browser mode (without existing canvas)
-
-```ts
-const chart = new Chart();
-
-// configure graph here.
-
-// add the graph to the page :
-document.body.append( chart.canvas );
-```
-
-#### In CLI mode
-
-```ts
-// use https://github.com/Automattic/node-canvas/
-// npm install canvas.
-import {Canvas} from "canvas";
-const canvas = new Canvas(W,H);
-
-const chart = new Chart(canvas);
-
-// configure graph here.
-
-// In CLI mode (Deno, Node, Bun), changes made after initialization
-// requires an explicit call to .update().
-chart.update();
-
-// save the graph as a png file.
-await Deno.writeFile("chart.png", await canvas.toBuffer());
-```
+ChartJS++ has an intelligent update strategy to prevent useless computations:
+1. A `requestUpdate()` is triggered (e.g. a property has changed).
+2. If an update has already been triggered, do nothing.
+3. Else, request an update to each of the chart depending on the component.
+4. A chart will start updating at some point, and will try to update its components.
+5. If the component has already been updated, do nothing.
+6. Else, call the `onUpdate()` method.
 
 ## Build
 
