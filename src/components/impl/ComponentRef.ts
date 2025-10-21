@@ -31,10 +31,14 @@ export default class ComponentRef<
     }
 
     cloneRef(): this {
-        return new ComponentRef(this.target) as this;
+        return Reflect.construct(ComponentRef,
+                                [this.target],
+                                this.constructor );
     }
     override clone(): this {
-        return new ComponentRef(this.target.clone()) as this;
+        return Reflect.construct(ComponentRef,
+                                [this.target.clone()],
+                                this.constructor );
     }
     override remove(): this {
         if(this.parent === null)
