@@ -73,9 +73,17 @@ Enables to configure the zoom/pan of the graph:
 - `graph.setZoom(dir)` : dir is either `"x"`, `"y"`, `"xy"`, `false`.
 - `graph.resetZoom()`
 
+#### Tooltips
+
+You can add tooltip to your graph thanks to the `DefaultTooltipSystem`. You'll need to also specify the tooltip label on your datasets.
+
+| Property | Type | Default |
+|----------|------|---------|
+| `direction` | `"x"\|"y"\"xy"` | `xy` |
+| `title` | `string\|null\|(items: TooltipItem[]) => string\|null` | `null` |
+
 #### Datalabels
 
-#### Tooltips
 
 ### Dataset
 
@@ -88,6 +96,7 @@ Represents data shown in your graph (e.g. line, histogram, etc).
 | `data` | `[number,number][]` | `[]` |
 | `x` | `string` | `"x"` |
 | `y` | `string` | `"y"` |
+| `tooltip` | `string\|null\|(item: TooltipItem) => string\|null` | `null` |
 
 #### Points
 

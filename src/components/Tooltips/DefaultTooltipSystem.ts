@@ -1,23 +1,19 @@
-import { Chart, ChartTypeRegistry, InteractionMode, Tooltip, TooltipItem } from 'chart.js';
+import { Chart, ChartType, ChartTypeRegistry, InteractionMode, Tooltip, TooltipItem } from 'chart.js';
 import createComponentClass from '../impl/createComponentClass';
 
 Chart.register(Tooltip);
 
 type Direction = "x" | "xy" | "y";
 
-type TooltipTitleCallback = (items: TooltipItem<keyof ChartTypeRegistry>[]) => string|void;
-type TooltipTitle = null|string|TooltipTitleCallback;
 
-export const DEFAULT_TOOLTIP_TITLE: TooltipTitleCallback = (items) => {
-    if(items.length === 0)
-        return;
-    return `${items[0].parsed.x}`;
-};
+type TooltipLabelCallback = (item: TooltipItem<keyof ChartTypeRegistry>) => string|null;
+export type TooltipLabel = null|string|TooltipLabelCallback;
+
+type TooltipTitleCallback = (items: TooltipItem<keyof ChartTypeRegistry>[]) => string|null;
+type TooltipTitle = null|string|TooltipTitleCallback;
 
 const NULL_TOOLTIP_TITLE = () => {};
 
-// hover seems unnecessary.
-// I keep it for now just in case...
 const DefaultTooltipSystem = createComponentClass({
     name      : "DefaultTooltipSystem",
     properties: {
@@ -26,10 +22,10 @@ const DefaultTooltipSystem = createComponentClass({
     },
     createInternalData() {
         return {
-            /*hover  : {
+            hover  : {
                 mode     : "point" as InteractionMode,
                 intersect: true
-            },*/
+            },
             tooltip: {
                 enabled: true,
 
@@ -40,13 +36,41 @@ const DefaultTooltipSystem = createComponentClass({
                     family: 'Courier New'
                 },
 
-                //TODO: filter (cf chartHTML)
-                // filter is per dataset
-                
+                filter<TType extends ChartType>(item: TooltipItem<TType>, ...args: any[]) {
+
+                    const point = item.parsed as any;
+                    if( point.x === null || point.y === null )
+                        return false;
+
+                    let tooltip: TooltipLabel = (item.dataset as any).tooltip;
+
+                    // Well can't access real label as the callback is called
+                    // after filtering...
+                    if( typeof tooltip === "function")
+                        tooltip = tooltip(item);
+                    
+                    if(   tooltip === undefined
+                       || tooltip === null
+                       || tooltip === "")
+                        return false;
+
+                    return true;
+                },
+
                 callbacks: {
-                    title: DEFAULT_TOOLTIP_TITLE,
-                    label: () => { return "ok" }
-                    // label is per dataset
+                    title: NULL_TOOLTIP_TITLE,
+                    label: (item: TooltipItem<keyof ChartTypeRegistry>) => {
+
+                        let tooltip: TooltipLabel = (item.dataset as any).tooltip;
+
+                        if( typeof tooltip === "function")
+                            tooltip = tooltip(item);
+
+                        if( tooltip === undefined || tooltip === null )
+                            return "";
+                        
+                        return tooltip;
+                    }
                 },
 
                 mode: "point" as InteractionMode,
@@ -55,7 +79,7 @@ const DefaultTooltipSystem = createComponentClass({
         }
     },
     onInsert(chart, internals) {
-        //chart.options.hover            = internals.hover;
+        chart.options.hover            = internals.hover;
         chart.options.plugins!.tooltip = internals.tooltip;
     },
     onRemove(chart, internals) {
@@ -70,8 +94,8 @@ const DefaultTooltipSystem = createComponentClass({
 
         const intersect = mode === "point";
 
-        internals.tooltip.mode      = mode;
-        internals.tooltip.intersect = intersect;
+        internals.hover.mode      = internals.tooltip.mode      = mode;
+        internals.hover.intersect = internals.tooltip.intersect = intersect;
 
         const title = data.title;
         if( title === null)
@@ -79,10 +103,12 @@ const DefaultTooltipSystem = createComponentClass({
         else if( typeof title === "string")
             internals.tooltip.callbacks.title = () => title;
         else
-            internals.tooltip.callbacks.title = title;
+            internals.tooltip.callbacks.title = (item) => {
+                const res = title(item);
+                if( res === null ) return;
+                return res;
+            };
 
-        //internals.hover.mode      = internals.tooltip.mode      = mode;
-        //internals.hover.intersect = internals.tooltip.intersect = intersect;
     },
 });
 
@@ -96,16 +122,6 @@ declare module "../../Chart" {
 
 
 // OLD CODE (still useful ?)
-
-/*            
-    tooltip: {
-
-        filter: <TType extends ChartType>(context: TooltipItem<TType>) => {
-            let name = (context.dataset as ChartDataset<TType>).label!;
-            return this.#elements[name].filter(context);
-        },
-    }
-}*/
 
 /*itemSort: <TTypeA extends ChartType, TTypeB extends ChartType>(a: TooltipItem<TTypeA>, b: TooltipItem<TTypeB>) => {
 

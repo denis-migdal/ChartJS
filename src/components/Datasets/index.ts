@@ -1,15 +1,17 @@
 import { ChartDataset } from "chart.js";
 import createComponentClass from "../impl/createComponentClass";
+import { TooltipLabel } from "../Tooltips/DefaultTooltipSystem";
 
 const Dataset = createComponentClass({
     name          : "Dataset",
     properties: {
-        name : null as string|null,
-        type : "scatter",
-        color: "black",
-        data : [] as [number, number][],
-        x    : "x",
-        y    : "y"
+        name   : null as string|null,
+        type   : "scatter",
+        color  : "black",
+        data   : [] as [number, number][],
+        x      : "x",
+        y      : "y",
+        tooltip: null as TooltipLabel
     },
     cstrArgsParser: (opts, data: [number, number][]) => {
         opts.data = data;
@@ -17,7 +19,7 @@ const Dataset = createComponentClass({
     createInternalData() {
         return {
             prevData: null as any,
-            dataset : {} as ChartDataset<any>,
+            dataset : {} as ChartDataset<any> & {tooltip?: TooltipLabel},
         }
     },
     onInsert(chart, internals) {
@@ -37,14 +39,15 @@ const Dataset = createComponentClass({
 });
 
 type Data<D extends any> = {
-    color: string,
-    x    : string,
-    y    : string,
-    data : D
+    color  : string,
+    x      : string,
+    y      : string,
+    data   : D,
+    tooltip: TooltipLabel
 }
 
 type Internal<D extends any> = {
-    dataset : ChartDataset<any>,
+    dataset : ChartDataset<any> & {tooltip?: TooltipLabel},
     prevData: D
 }
 
@@ -67,6 +70,8 @@ export function updateDataset<D extends any>(data      : Data<D>,
     dataset.yAxisID = data.y;
 
     dataset.borderColor = dataset.backgroundColor = data.color;
+
+    internals.dataset.tooltip = data.tooltip;
 
     // recomputing data might be costly...
     if( internals.prevData !== data.data) {

@@ -1,6 +1,8 @@
 ## TODO
 
-- 2 components to add (datalabel, tooltip)
+- add datalabel component...
+- data : test avoid realloc array (benchmark)...
+
 - zoom limits
 
 ## ChartHTML
