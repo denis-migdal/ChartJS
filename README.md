@@ -84,6 +84,7 @@ You can add tooltip to your graph thanks to the `DefaultTooltipSystem`. You'll n
 
 #### Datalabels
 
+You can add datalabels to your graph thanks to the `DefaultDatalabelSystem`. You'll need to also specify the datalabel on your datasets.
 
 ### Dataset
 
@@ -97,6 +98,7 @@ Represents data shown in your graph (e.g. line, histogram, etc).
 | `x` | `string` | `"x"` |
 | `y` | `string` | `"y"` |
 | `tooltip` | `string\|null\|(item: TooltipItem) => string\|null` | `null` |
+| `datalabel` | `string\|null\|(value, context) => string\|null` | `null` |
 
 #### Points
 
