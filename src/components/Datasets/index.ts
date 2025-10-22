@@ -51,14 +51,27 @@ type Internal<D extends any> = {
     prevData: D
 }
 
-type DataParser<D extends any> = (raw: D) => {x: number, y: number}[];
+type DataParser<D extends any> = (raw: D, target: {x: number, y: number}[]) => void;
 
-export function rawParser(data: ReadonlyArray<readonly [number,number]>) {
-    let parsedData = new Array(data.length);
-    for(let i = 0; i < data.length; ++i)
-        parsedData[i] = {x: data[i][0], y: data[i][1]};
+export function rawParser(data  : ReadonlyArray<readonly [number,number]>,
+                          target: {x: number, y: number}[]) {
 
-    return parsedData;
+    if( data.length < target.length)
+        target.length = data.length;
+
+    let i;
+    for(i = 0; i < target.length; ++i) {
+        target[i].x = data[i][0]
+        target[i].y = data[i][1]
+    }
+
+    if( target.length === data.length )
+        return
+    
+    target.length = data.length;
+    for(i = 0; i < target.length; ++i)
+        target[i] = {x: data[i][0], y: data[i][1]}
+
 }
 
 export function updateDataset<D extends any>(data      : Data<D>,
@@ -76,7 +89,7 @@ export function updateDataset<D extends any>(data      : Data<D>,
     // recomputing data might be costly...
     if( internals.prevData !== data.data) {
         internals.prevData = data.data;
-        dataset.data = dataParser(data.data);
+        dataParser(data.data, dataset.data);
     }
 }
 

@@ -17,13 +17,16 @@ const VLine = override(Line, {
     }
 });
 
-function VLineParser(value: number|null) {
+function VLineParser(value: number|null, target: {x: number, y:number}[]) {
 
-    if( value === null)
-        return [];
+    if( value === null) {
+        target.length = 0;
+        return;
+    }
 
-    return [{x: value, y: Number.NEGATIVE_INFINITY},
-            {x: value, y: Number.POSITIVE_INFINITY}];
+    target.length = 2;
+    target[0] = {x: value, y: Number.NEGATIVE_INFINITY};
+    target[1] = {x: value, y: Number.POSITIVE_INFINITY};
 }
 
 declare module "../../Chart" {

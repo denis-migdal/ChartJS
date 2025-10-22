@@ -15,6 +15,7 @@ const Points = derive(Dataset, {
             prevData: null as any,
             dataset  : {
                 type              : "bar",
+                data              : [],
                 borderWidth       : 0,
                 barPercentage     : 1,
                 categoryPercentage: 1,

@@ -1,7 +1,6 @@
 ## TODO
 
 - add datalabel component...
-- data : test avoid realloc array...
 
 - zoom limits
 

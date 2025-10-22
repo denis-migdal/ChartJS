@@ -16,6 +16,7 @@ const Line = derive(Dataset, {
             prevData: null as any,
             dataset  : {
                 type       : "scatter",
+                data       : [],
                 showLine   : true,
                 borderWidth: 2,
                 parsing    : false,

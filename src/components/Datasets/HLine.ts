@@ -17,13 +17,16 @@ const HLine = override(Line, {
     }
 });
 
-function HLineParser(value: number|null) {
+function HLineParser(value: number|null, target: {x: number, y:number}[]) {
 
-    if( value === null)
-        return [];
+    if( value === null) {
+        target.length = 0;
+        return;
+    }
 
-    return [{x: Number.NEGATIVE_INFINITY, y: value},
-            {x: Number.POSITIVE_INFINITY, y: value}];
+    target.length = 2;
+    target[0] = {x: Number.NEGATIVE_INFINITY, y: value};
+    target[1] = {x: Number.POSITIVE_INFINITY, y: value};
 }
 
 declare module "../../Chart" {
