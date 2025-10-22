@@ -136,5 +136,3 @@ function setScaleAsCategory(scale: CatScale) {
     scale.offset = true;
     scale.grid   = CatGrid;
 }
-
-

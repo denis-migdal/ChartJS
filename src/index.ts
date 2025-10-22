@@ -3,6 +3,8 @@ import Chart from "./Chart";
 export {default as Scale } from "./components/Scale";
 export {default as Zoom } from "./components/Zoom";
 
+export {default as DefaultTooltipSystem } from "./components/Tooltips/DefaultTooltipSystem";
+
 export {default as Line } from "./components/Datasets/Line";
 export {default as HLine} from "./components/Datasets/HLine";
 export {default as VLine} from "./components/Datasets/VLine";
