@@ -1,6 +1,6 @@
 ## TODO
 
-- add datalabel component...
+- datalabel system with click switch.
 
 - zoom limits
 
