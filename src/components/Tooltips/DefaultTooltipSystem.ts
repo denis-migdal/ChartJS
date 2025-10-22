@@ -12,7 +12,7 @@ export type TooltipLabel = null|string|TooltipLabelCallback;
 type TooltipTitleCallback = (items: TooltipItem<keyof ChartTypeRegistry>[]) => string|null;
 type TooltipTitle = null|string|TooltipTitleCallback;
 
-const NULL_TOOLTIP_TITLE = () => {};
+const NULL_TOOLTIP_TITLE = (items: TooltipItem<keyof ChartTypeRegistry>[]) => {};
 
 const DefaultTooltipSystem = createComponentClass({
     name      : "DefaultTooltipSystem",
@@ -97,6 +97,8 @@ const DefaultTooltipSystem = createComponentClass({
         internals.hover.mode      = internals.tooltip.mode      = mode;
         internals.hover.intersect = internals.tooltip.intersect = intersect;
 
+        // we don't care if we recreate a function at each update as tooltip
+        // should not be updated frequently.
         const title = data.title;
         if( title === null)
             internals.tooltip.callbacks.title = NULL_TOOLTIP_TITLE;
