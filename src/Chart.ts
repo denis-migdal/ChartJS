@@ -50,6 +50,9 @@ export class ChartJS extends WithUpdate(Object, {selfAsTarget: false})
 				responsive: true,
 				maintainAspectRatio: false,
                 plugins: {
+                    tooltip: {
+                        enabled: false
+                    },
                     datalabels: {
                         display: false
                     }
