@@ -28,8 +28,6 @@ const DefaultDatalabelSystem = createComponentClass({
                 formatter: (value: {x: number, y: number}, context: Context) => {
                     let datalabel: Datalabel = (context.dataset as any).datalabel;
 
-                    console.warn(context.dataset, datalabel);
-
                     if( typeof datalabel === "function")
                             datalabel = datalabel(value, context);
 
