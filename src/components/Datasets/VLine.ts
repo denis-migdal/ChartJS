@@ -1,4 +1,4 @@
-import { updateDataset } from ".";
+import { ParsedDataset, updateDataset } from ".";
 import override from "../impl/override";
 import { WithComponent } from "../impl/registerComponent";
 import Line from "./Line";
@@ -17,16 +17,18 @@ const VLine = override(Line, {
     }
 });
 
-function VLineParser(value: number|null, target: {x: number, y:number}[]) {
+function VLineParser(value: number|null, target: ParsedDataset) {
 
     if( value === null) {
         target.length = 0;
-        return;
+        return target;
     }
 
     target.length = 2;
     target[0] = {x: value, y: Number.NEGATIVE_INFINITY};
     target[1] = {x: value, y: Number.POSITIVE_INFINITY};
+
+    return target;
 }
 
 declare module "../../Chart" {

@@ -8,19 +8,22 @@ type DatasetExtra = {
     datalabel?: Datalabel
 }
 
+export type ParsedDataset = {x: number, y: number}[];
+export type RawDataset    = [number, number][]|ParsedDataset;
+
 const Dataset = createComponentClass({
     name          : "Dataset",
     properties: {
         name   : null as string|null,
         type   : "scatter",
         color  : "black",
-        data   : [] as [number, number][],
+        data   : [] as RawDataset,
         x      : "x",
         y      : "y",
         tooltip  : null as TooltipLabel,
         datalabel: null as Datalabel
     },
-    cstrArgsParser: (opts, data: [number, number][]) => {
+    cstrArgsParser: (opts, data: RawDataset) => {
         opts.data = data;
     },
     createInternalData() {
@@ -46,10 +49,10 @@ const Dataset = createComponentClass({
 });
 
 type Data<D extends any> = {
-    color  : string,
-    x      : string,
-    y      : string,
-    data   : D,
+    color    : string,
+    x        : string,
+    y        : string,
+    data     : D,
     tooltip  : TooltipLabel,
     datalabel: Datalabel
 }
@@ -59,10 +62,20 @@ type Internal<D extends any> = {
     prevData: D
 }
 
-type DataParser<D extends any> = (raw: D, target: {x: number, y: number}[]) => void;
+type DataParser<D extends any> = (raw: D, target: ParsedDataset) => ParsedDataset;
 
-export function rawParser(data  : ReadonlyArray<readonly [number,number]>,
-                          target: {x: number, y: number}[]) {
+function isParsed(data: RawDataset): data is ParsedDataset {
+    return data.length === 0 || ! Array.isArray(data[0]);
+}
+
+export function rawParser(data  : RawDataset,
+                          prev  : ParsedDataset) {
+    
+    if( isParsed(data) )
+        return data;
+
+    // reuse previous data.
+    const target = prev;
 
     if( data.length < target.length)
         target.length = data.length;
@@ -74,12 +87,13 @@ export function rawParser(data  : ReadonlyArray<readonly [number,number]>,
     }
 
     if( target.length === data.length )
-        return
+        return target;
     
     target.length = data.length;
     for(i = 0; i < target.length; ++i)
         target[i] = {x: data[i][0], y: data[i][1]}
 
+    return target;
 }
 
 export function updateDataset<D extends any>(data      : Data<D>,
@@ -98,7 +112,7 @@ export function updateDataset<D extends any>(data      : Data<D>,
     // recomputing data might be costly...
     if( internals.prevData !== data.data) {
         internals.prevData = data.data;
-        dataParser(data.data, dataset.data);
+        dataset.data = dataParser(data.data, dataset.data);
     }
 }
 
