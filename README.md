@@ -94,7 +94,7 @@ Represents data shown in your graph (e.g. line, histogram, etc).
 |----------|------|---------|
 | `color` | `string` | `"black"` |
 | `type` | `string` | `"scatter"` |
-| `data` | `[number,number][]` | `[]` |
+| `data` | `{x: number, y:number}[]\|[number,number][]\|number[]` | `[]` |
 | `x` | `string` | `"x"` |
 | `y` | `string` | `"y"` |
 | `tooltip` | `string\|null\|(item: TooltipItem) => string\|null` | `null` |
@@ -115,6 +115,7 @@ Represents a bar. Works better with a category scale.
 | Property | Type | Default |
 |----------|------|---------|
 | `type` | `"bar"` | `"bar"` |
+| `reversed` | `boolean` | `false` |
 
 #### Line
 

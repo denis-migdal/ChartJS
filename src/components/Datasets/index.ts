@@ -9,7 +9,7 @@ type DatasetExtra = {
 }
 
 export type ParsedDataset = {x: number, y: number}[];
-export type RawDataset    = [number, number][]|ParsedDataset;
+export type RawDataset    = number[]|[number, number][]|ParsedDataset;
 
 const Dataset = createComponentClass({
     name          : "Dataset",
@@ -65,7 +65,11 @@ type Internal<D extends any> = {
 type DataParser<D extends any> = (raw: D, target: ParsedDataset) => ParsedDataset;
 
 function isParsed(data: RawDataset): data is ParsedDataset {
-    return data.length === 0 || ! Array.isArray(data[0]);
+    return data.length === 0 || typeof data[0] === "object" && ! Array.isArray(data[0]);
+}
+
+function isPoints(data: RawDataset): data is [number,number][] {
+    return Array.isArray(data[0]);
 }
 
 export function rawParser(data  : RawDataset,
@@ -74,6 +78,8 @@ export function rawParser(data  : RawDataset,
     if( isParsed(data) )
         return data;
 
+    const isPts = isPoints(data);
+
     // reuse previous data.
     const target = prev;
 
@@ -81,17 +87,29 @@ export function rawParser(data  : RawDataset,
         target.length = data.length;
 
     let i;
-    for(i = 0; i < target.length; ++i) {
-        target[i].x = data[i][0]
-        target[i].y = data[i][1]
+    if( isPts ) {
+        for(i = 0; i < target.length; ++i) {
+            target[i].x = data[i][0]
+            target[i].y = data[i][1]
+        }
+    } else {
+        for(i = 0; i < target.length; ++i) {
+            target[i].x = i
+            target[i].y = data[i];
+        }
     }
 
     if( target.length === data.length )
         return target;
     
     target.length = data.length;
-    for(i = 0; i < target.length; ++i)
-        target[i] = {x: data[i][0], y: data[i][1]}
+
+    if( isPts )
+        for( ; i < target.length; ++i)
+            target[i] = {x: data[i][0], y: data[i][1]}
+    else
+        for( ; i < target.length; ++i)
+            target[i] = {x: i, y: data[i]};
 
     return target;
 }

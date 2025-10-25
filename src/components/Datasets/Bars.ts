@@ -1,14 +1,15 @@
 import { WithComponent } from "../impl/registerComponent";
 import derive from "../impl/derive";
-import Dataset from ".";
+import Dataset, { ParsedDataset, RawDataset, rawParser, updateDataset } from ".";
 
 import {Chart, BarController, BarElement, ChartDataset} from 'chart.js';
 Chart.register(BarElement, BarController);
 
-const Points = derive(Dataset, {
+const Bars = derive(Dataset, {
     name      : "Bars",
     properties: {
         type: "bar" as const,
+        reversed: false
     },
     createInternalData() {
         return {
@@ -26,11 +27,27 @@ const Points = derive(Dataset, {
                 normalized: true
             } as ChartDataset<"bar">,
         }
-    }
+    },
+    onUpdate: (data, internals) => {
+        let parser = rawParser;
+        if( data.reversed)
+            parser = reversedParser;
+
+        updateDataset(data, internals, parser);
+    },
 });
 
-declare module "../../Chart" {
-    interface ChartJS extends WithComponent<typeof Points> {}
+function reversedParser(data: RawDataset, prev: ParsedDataset) {
+    const line = rawParser(data, prev);
+    if( line === data)
+        throw new Error("Not implemented yet");
+    for(let i = 0; i < line.length; ++i)
+        line[i].y *= -1;
+    return line;
 }
 
-export default Points;
+declare module "../../Chart" {
+    interface ChartJS extends WithComponent<typeof Bars> {}
+}
+
+export default Bars;
